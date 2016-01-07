@@ -13,7 +13,7 @@ end
 prompt "Welcome to Calculator"
 
 loop do
-  number1 = ""
+  number1 = ''
   loop do
     prompt "What's the first number?"
     number1 = gets.chomp
@@ -21,7 +21,7 @@ loop do
     prompt "#{number1} does not look like a valid number"
   end
 
-  number2 = ""
+  number2 = ''
   loop do
     prompt "What's the second number?"
     number2 = gets.chomp
@@ -46,4 +46,9 @@ loop do
     end
 
   prompt "The result is #{result}"
+  prompt "Do you want to perform another calculation (Y for yes)?"
+  answer = gets.chomp.downcase
+  break unless answer.start_with? 'y'
 end
+
+prompt "Thank you for using Calculator. Bye!"
