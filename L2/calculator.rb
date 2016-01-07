@@ -3,11 +3,11 @@ def prompt(message)
   puts "=> #{message}"
 end
 
-# Return true if #{value} is a valid number, false otherwise.
-# Currently returns false is #{value} is "0" or equivalent value.
-# Currently returns true if #{value} just starts with a number
+# Return true if #{value} is a valid integer, false otherwise.
 def valid_number?(value)
-  value.to_i != 0
+  Integer(value)
+rescue ArgumentError
+  false
 end
 
 # Convert operation shorthand to an -ing verb.
