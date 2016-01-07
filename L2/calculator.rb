@@ -4,7 +4,7 @@ def prompt(message)
 end
 
 # Return true if #{value} is a valid integer, false otherwise.
-def valid_number?(value)
+def number?(value)
   Integer(value)
 rescue ArgumentError
   false
@@ -40,7 +40,7 @@ loop do
   loop do
     prompt "What's the first number?"
     number1 = gets.chomp
-    break if valid_number? number1
+    break if number? number1
     prompt "#{number1} does not look like a valid number"
   end
 
@@ -48,7 +48,7 @@ loop do
   loop do
     prompt "What's the second number?"
     number2 = gets.chomp
-    break if valid_number? number2
+    break if number? number2
     prompt "#{number2} does not look like a valid number"
   end
 
