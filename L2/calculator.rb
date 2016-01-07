@@ -10,6 +10,20 @@ def valid_number?(value)
   value.to_i != 0
 end
 
+# Convert operation shorthand to an -ing verb.
+def operation_verbing(operator)
+  case operator
+  when '1'
+    'Adding'
+  when '2'
+    'Subtracting'
+  when '3'
+    'Multiplying'
+  when '4'
+    'Dividing'
+  end
+end
+
 prompt "Welcome to Calculator. Enter your name:"
 
 name = ''
@@ -53,6 +67,7 @@ loop do
     prompt "Please enter 1, 2, 3, or 4"
   end
 
+  prompt "#{operation_verbing operator} #{number1} and #{number2}"
   result =
     case operator
     when '1'
