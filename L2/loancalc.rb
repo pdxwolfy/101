@@ -80,7 +80,7 @@ def valid_duration?(value)
   valid_non_negative_integer? value
 end
 
-def solicit_loan_amount
+def loan_amount
   loop do
     amount = solicit MESSAGES['enter_amount']
     return amount.to_f if valid_dollar_amount? amount
@@ -88,7 +88,7 @@ def solicit_loan_amount
   end
 end
 
-def solicit_apr
+def loan_apr
   loop do
     apr = solicit MESSAGES['enter_apr']
     return apr.to_f if valid_apr? apr
@@ -96,7 +96,7 @@ def solicit_apr
   end
 end
 
-def solicit_duration_in_years
+def loan_duration_in_years
   loop do
     duration = solicit MESSAGES['enter_duration']
     return duration.to_i if valid_duration? duration
@@ -106,10 +106,10 @@ end
 
 prompt MESSAGES['welcome']
 loop do
-  amount = solicit_loan_amount
-  apr = solicit_apr
+  amount = loan_loan_amount
+  apr = loan_apr
   monthly_rate = apr / 12.0
-  months = 12 * solicit_duration_in_years
+  months = 12 * loan_duration_in_years
   factor = (1 + monthly_rate)**months
   payment = amount * (factor * monthly_rate) / (factor - 1)
   prompt format(MESSAGES['results'], amount, months, apr, payment)
