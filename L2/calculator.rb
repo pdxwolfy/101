@@ -12,17 +12,14 @@ end
 
 # Convert operation shorthand to an -ing verb.
 def operation_verbing(operator)
-  result =
-    case operator
-    when '1'
-      'Adding'
-    when '2'
-      'Subtracting'
-    when '3'
-      'Multiplying'
-    when '4'
-      'Dividing'
-    end
+  lookup_table = {
+    '1' => 'Adding',
+    '2' => 'Subtracting',
+    '3' => 'Multiplying',
+    '4' => 'Dividing'
+  }
+
+  result = lookup_table[operator]
   result
 end
 
