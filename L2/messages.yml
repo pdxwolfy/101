@@ -1,0 +1,22 @@
+adding:         Adding
+another_calc:   Do you want to perform another calculation (Y for yes)?
+bad_number:     That does not look like a valid number.
+bad_op:         Please enter 1, 2, 3, or 4
+dividing:       Dividing
+first_number:   What's the first number?
+hello:          Hi %{name}!
+multiplying:    Multiplying
+result_is:      The result is %{result}
+second_number:  What's the second number?
+subtracting:    Subtracting
+thank_you:      Thank you for using Calculator. Bye!
+use_real_name:  Make sure you use your real name.
+welcome:        "Welcome to Calculator. Enter your name: "
+what_op:        |
+                What operation would you like to perform?
+                  1) add
+                  2) subtract
+                  3) multiply
+                  4) divide
+will_do:        "%{operating} %{number1} and %{number2}"
+'yes':          y

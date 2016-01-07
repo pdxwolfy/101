@@ -1,4 +1,6 @@
-load 'messages.en'
+require 'yaml'
+
+MESSAGES = YAML.load_file('messages.yml')
 
 # Display a prompt
 def prompt(message)
@@ -15,52 +17,52 @@ end
 # Convert operation shorthand to an -ing verb.
 def operation_verbing(operator)
   lookup_table = {
-    '1' => MESSAGES[:ADDING],
-    '2' => MESSAGES[:SUBTRACTING],
-    '3' => MESSAGES[:MULTIPLYING],
-    '4' => MESSAGES[:DIVIDING]
+    '1' => MESSAGES['adding'],
+    '2' => MESSAGES['subtracting'],
+    '3' => MESSAGES['multiplying'],
+    '4' => MESSAGES['dividing']
   }
 
   lookup_table[operator]
 end
 
-prompt MESSAGES[:WELCOME]
+prompt MESSAGES['welcome']
 
 name = ''
 loop do
   name = gets.chomp
   break unless name.empty?
-  prompt MESSAGES[:USE_REAL_NAME]
+  prompt MESSAGES['use_real_name']
 end
 
-prompt MESSAGES[:HELLO] % { name: name }
+prompt MESSAGES['hello'] % { name: name }
 
 loop do
   number1 = ''
   loop do
-    prompt MESSAGES[:FIRST_NUMBER]
+    prompt MESSAGES['first_number']
     number1 = gets.chomp
     break if number? number1
-    prompt MESSAGES[:BAD_NUMBER]
+    prompt MESSAGES['bad_number']
   end
 
   number2 = ''
   loop do
-    prompt MESSAGES[:SECOND_NUMBER]
+    prompt MESSAGES['second_number']
     number2 = gets.chomp
     break if number? number2
-    prompt MESSAGES[:BAD_NUMBER]
+    prompt MESSAGES['bad_number']
   end
 
   operator = ''
-  prompt MESSAGES[:WHAT_OP]
+  prompt MESSAGES['what_op']
   loop do
     operator = gets.chomp
     break if %(1 2 3 4).include? operator
-    prompt MESSAGES[:BAD_OP]
+    prompt MESSAGES['bad_op']
   end
 
-  prompt MESSAGES[:WILL_DO] % {
+  prompt MESSAGES['will_do'] % {
     operating: operation_verbing(operator),
     number1: number1,
     number2: number2
@@ -79,10 +81,10 @@ loop do
       number1.to_f / number2.to_f
     end
 
-  prompt MESSAGES[:RESULT_IS] % { result: result }
-  prompt MESSAGES[:ANOTHER_CALC]
+  prompt MESSAGES['result_is'] % { result: result }
+  prompt MESSAGES['another_calc']
   answer = gets.chomp.downcase
-  break unless answer.start_with? MESSAGES[:YES]
+  break unless answer.start_with? MESSAGES['yes']
 end
 
-prompt MESSAGES[:THANK_YOU]
+prompt MESSAGES['thank_you']
