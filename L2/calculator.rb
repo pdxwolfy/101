@@ -1,6 +1,11 @@
 require 'yaml'
 
+LANGUAGE = 'de'
 MESSAGES = YAML.load_file('messages.yml')
+
+def messages(message, language = LANGUAGE)
+  MESSAGES[language][message]
+end
 
 # Display a prompt
 def prompt(message)
@@ -17,52 +22,52 @@ end
 # Convert operation shorthand to an -ing verb.
 def operation_verbing(operator)
   lookup_table = {
-    '1' => MESSAGES['adding'],
-    '2' => MESSAGES['subtracting'],
-    '3' => MESSAGES['multiplying'],
-    '4' => MESSAGES['dividing']
+    '1' => messages('adding'),
+    '2' => messages('subtracting'),
+    '3' => messages('multiplying'),
+    '4' => messages('dividing')
   }
 
   lookup_table[operator]
 end
 
-prompt MESSAGES['welcome']
+prompt messages('welcome')
 
 name = ''
 loop do
   name = gets.chomp
   break unless name.empty?
-  prompt MESSAGES['use_real_name']
+  prompt messages('use_real_name')
 end
 
-prompt MESSAGES['hello'] % { name: name }
+prompt messages('hello') % { name: name }
 
 loop do
   number1 = ''
   loop do
-    prompt MESSAGES['first_number']
+    prompt messages('first_number')
     number1 = gets.chomp
     break if number? number1
-    prompt MESSAGES['bad_number']
+    prompt messages('bad_number')
   end
 
   number2 = ''
   loop do
-    prompt MESSAGES['second_number']
+    prompt messages('second_number')
     number2 = gets.chomp
     break if number? number2
-    prompt MESSAGES['bad_number']
+    prompt messages('bad_number')
   end
 
   operator = ''
-  prompt MESSAGES['what_op']
+  prompt messages('what_op')
   loop do
     operator = gets.chomp
     break if %(1 2 3 4).include? operator
-    prompt MESSAGES['bad_op']
+    prompt messages('bad_op')
   end
 
-  prompt MESSAGES['will_do'] % {
+  prompt messages('will_do') % {
     operating: operation_verbing(operator),
     number1: number1,
     number2: number2
@@ -81,10 +86,10 @@ loop do
       number1.to_f / number2.to_f
     end
 
-  prompt MESSAGES['result_is'] % { result: result }
-  prompt MESSAGES['another_calc']
+  prompt messages('result_is') % { result: result }
+  prompt messages('another_calc')
   answer = gets.chomp.downcase
-  break unless answer.start_with? MESSAGES['yes']
+  break unless answer.start_with? messages('yes')
 end
 
-prompt MESSAGES['thank_you']
+prompt messages('thank_you')
