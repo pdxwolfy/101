@@ -5,7 +5,7 @@ end
 
 # Return true if #{value} is a valid integer, false otherwise.
 def number?(value)
-  Integer(value)
+  Float(value)
 rescue ArgumentError
   false
 end
@@ -71,11 +71,11 @@ loop do
   result =
     case operator
     when '1'
-      number1.to_i + number2.to_i
+      number1.to_f + number2.to_f
     when '2'
-      number1.to_i - number2.to_i
+      number1.to_f - number2.to_f
     when '3'
-      number1.to_i * number2.to_i
+      number1.to_f * number2.to_f
     when '4'
       # Warn: possible divide by 0 if 0 input is allowed
       number1.to_f / number2.to_f
