@@ -38,8 +38,13 @@ loop do
     prompt "#{number2} does not look like a valid number"
   end
 
+  operator = ''
   prompt "What operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide"
-  operator = gets.chomp
+  loop do
+    operator = gets.chomp
+    break if %(1 2 3 4).include? operator
+    prompt "Please enter 1, 2, 3, or 4"
+  end
 
   result =
     case operator
