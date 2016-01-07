@@ -29,10 +29,54 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+# Get loan amount from user. Returns non-negative float.
+def loan_amount
+  loop do
+    amount = solicit MESSAGES['enter_amount']
+    return amount.to_f if valid_dollar_amount? amount
+    prompt MESSAGES['bad_amount']
+  end
+end
+
+# Get loan APR from user. Returns float between 0.0 and 1.0
+def loan_apr
+  loop do
+    apr = solicit MESSAGES['enter_apr']
+    return apr.to_f if valid_apr? apr
+    prompt MESSAGES['bad_apr']
+  end
+end
+
+# Get loan duration in years. Returns integer.
+def loan_duration_in_years
+  loop do
+    duration = solicit MESSAGES['enter_duration']
+    return duration.to_i if valid_duration? duration
+    prompt MESSAGES['bad_duration']
+  end
+end
+
 # Display a prompt and get a string
 def solicit(message)
   prompt(message)
   gets.chomp
+end
+
+# Return true if #{value} can be properly represented as an APR between 0.00
+# and 1.00, false otherwise.
+def valid_apr?(value)
+  valid_non_negative_float?(value) && value.to_f <= 1.00
+end
+
+# Returns true if #{value} can be properly represented as a dollar amount.
+def valid_dollar_amount?(value)
+  valid_non_negative_float? value
+end
+
+# Returns true if #{value} can be properly represented as a valid duration in
+# years.
+def valid_duration?(value)
+  valid_non_negative_integer? value
 end
 
 # Returns true if #{value} can be properly represented as a floating point
@@ -63,50 +107,9 @@ def valid_non_negative_integer?(value)
   valid_integer?(value) && value.to_i >= 0
 end
 
-# Returns true if #{value} can be properly represented as a dollar amount.
-def valid_dollar_amount?(value)
-  valid_non_negative_float? value
-end
-
-# Return true if #{value} can be properly represented as an APR between 0.00
-# and 1.00, false otherwise.
-def valid_apr?(value)
-  valid_non_negative_float?(value) && value.to_f <= 1.00
-end
-
-# Returns true if #{value} can be properly represented as a valid duration in
-# years.
-def valid_duration?(value)
-  valid_non_negative_integer? value
-end
-
-def loan_amount
-  loop do
-    amount = solicit MESSAGES['enter_amount']
-    return amount.to_f if valid_dollar_amount? amount
-    prompt MESSAGES['bad_amount']
-  end
-end
-
-def loan_apr
-  loop do
-    apr = solicit MESSAGES['enter_apr']
-    return apr.to_f if valid_apr? apr
-    prompt MESSAGES['bad_apr']
-  end
-end
-
-def loan_duration_in_years
-  loop do
-    duration = solicit MESSAGES['enter_duration']
-    return duration.to_i if valid_duration? duration
-    prompt MESSAGES['bad_duration']
-  end
-end
-
 prompt MESSAGES['welcome']
 loop do
-  amount = loan_loan_amount
+  amount = loan_amount
   apr = loan_apr
   monthly_rate = apr / 12.0
   months = 12 * loan_duration_in_years
