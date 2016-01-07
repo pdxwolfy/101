@@ -10,7 +10,16 @@ def valid_number?(value)
   value.to_i != 0
 end
 
-prompt "Welcome to Calculator"
+prompt "Welcome to Calculator. Enter your name:"
+
+name = ''
+loop do
+  name = gets.chomp
+  break unless name.empty?
+  prompt "Make sure you use your real name."
+end
+
+prompt "Hi #{name}!"
 
 loop do
   number1 = ''
