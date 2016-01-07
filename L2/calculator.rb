@@ -39,7 +39,14 @@ loop do
   end
 
   operator = ''
-  prompt "What operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide"
+  prompt <<-EOS
+    What operation would you like to perform?
+    1) add
+    2) subtract
+    3) multiply
+    4) divide
+  EOS
+
   loop do
     operator = gets.chomp
     break if %(1 2 3 4).include? operator
