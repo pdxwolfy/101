@@ -19,8 +19,7 @@ def operation_verbing(operator)
     '4' => 'Dividing'
   }
 
-  result = lookup_table[operator]
-  result
+  lookup_table[operator]
 end
 
 prompt "Welcome to Calculator. Enter your name:"
