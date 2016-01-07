@@ -43,10 +43,24 @@ rescue ArgumentError
   false
 end
 
+# Returns true if #{value} can be properly represented as an Integer, false
+# otherwise.
+def valid_integer?(value)
+  Integer value
+rescue ArgumentError
+  false
+end
+
 # Returns true if #{value} can be properly represented as a non-negative
 # floating point number, false otherwise.
 def valid_non_negative_float?(value)
   valid_float?(value) && value.to_f >= 0.00
+end
+
+# Returns true if #{value} can be properly represented as a non-negative
+# integer, false otherwise.
+def valid_non_negative_integer?(value)
+  valid_integer?(value) && value.to_i >= 0
 end
 
 # Returns true if #{value} can be properly represented as a dollar amount.
@@ -60,10 +74,16 @@ def valid_apr?(value)
   valid_non_negative_float?(value) && value.to_f <= 1.00
 end
 
+# Returns true if #{value} can be properly represented as a valid duration in
+# years.
+def valid_duration?(value)
+  valid_non_negative_integer? value
+end
+
 def solicit_loan_amount
   loop do
     amount = solicit MESSAGES['enter_amount']
-    return amount if valid_dollar_amount? amount
+    return amount.to_f if valid_dollar_amount? amount
     prompt MESSAGES['bad_amount']
   end
 end
@@ -71,20 +91,28 @@ end
 def solicit_apr
   loop do
     apr = solicit MESSAGES['enter_apr']
-    return apr if valid_apr? apr
+    return apr.to_f if valid_apr? apr
     prompt MESSAGES['bad_apr']
   end
 end
 
-def calculate_loan_payment
-  amount = solicit_loan_amount
-  apr = solicit_apr
-  puts "amount = #{amount}   apr = #{apr}"
+def solicit_duration_in_years
+  loop do
+    duration = solicit MESSAGES['enter_duration']
+    return duration.to_i if valid_duration? duration
+    prompt MESSAGES['bad_duration']
+  end
 end
 
 prompt MESSAGES['welcome']
 loop do
-  calculate_loan_payment
+  amount = solicit_loan_amount
+  apr = solicit_apr
+  monthly_rate = apr / 12.0
+  months = 12 * solicit_duration_in_years
+  factor = (1 + monthly_rate)**months
+  payment = amount * (factor * monthly_rate) / (factor - 1)
+  puts format MESSAGES['results'], amount, apr, payment
   answer = solicit MESSAGES['try_again']
   break unless answer.downcase.start_with? MESSAGES['yes']
 end
