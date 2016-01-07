@@ -6,7 +6,7 @@ number1 = gets.chomp
 puts "What's the second number?"
 number2 = gets.chomp
 
- puts "What operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide"
+puts "What operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide"
 operator = gets.chomp
 
 if operator == '1'
