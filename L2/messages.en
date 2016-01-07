@@ -1,0 +1,25 @@
+MESSAGES = {
+  ADDING:         'Adding',
+  ANOTHER_CALC:   'Do you want to perform another calculation (Y for yes)?',
+  BAD_NUMBER:     'That does not look like a valid number.',
+  BAD_OP:         'Please enter 1, 2, 3, or 4',
+  DIVIDING:       'Dividing',
+  FIRST_NUMBER:   "What's the first number?",
+  HELLO:          'Hi %{name}!',
+  MULTIPLYING:    'Multiplying',
+  RESULT_IS:      'The result is %{result}',
+  SECOND_NUMBER:  "What's the second number?",
+  SUBTRACTING:    'Subtracting',
+  THANK_YOU:      'Thank you for using Calculator. Bye!',
+  USE_REAL_NAME:  'Make sure you use your real name.',
+  WELCOME:        'Welcome to Calculator. Enter your name:',
+  WHAT_OP:        <<-EOS,
+                    What operation would you like to perform?
+                    1) add
+                    2) subtract
+                    3) multiply
+                    4) divide
+                  EOS
+  WILL_DO:        '%{operating} %{number1} and %{number2}',
+  YES:            'y'
+}
