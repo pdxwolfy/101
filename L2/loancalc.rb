@@ -112,7 +112,8 @@ loop do
   months = 12 * solicit_duration_in_years
   factor = (1 + monthly_rate)**months
   payment = amount * (factor * monthly_rate) / (factor - 1)
-  puts format MESSAGES['results'], amount, apr, payment
+  prompt format(MESSAGES['results'], amount, months, apr, payment)
+
   answer = solicit MESSAGES['try_again']
   break unless answer.downcase.start_with? MESSAGES['yes']
 end

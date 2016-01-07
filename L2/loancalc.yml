@@ -7,8 +7,9 @@ en:
     enter_duration: What is the duration of the loan (in years)
     results:        |
                     Loan amount: $%.2f
-                    APR: %f
-                    Monthly payment: $%.2f
+                       Load duration: %d months
+                       APR: %g
+                       Monthly payment: $%.2f
     try_again:      Perform another loan calculation? (Y for yes)
     welcome:        |
                     Welcome to the Car Loan and Mortgage Payment Calculator!
