@@ -1,12 +1,17 @@
-puts "Welcome to Calculator"
+# Display a prompt
+def prompt(message)
+  puts "=> #{message}"
+end
 
-puts "What's the first number?"
+prompt "Welcome to Calculator"
+
+prompt "What's the first number?"
 number1 = gets.chomp
 
-puts "What's the second number?"
+prompt "What's the second number?"
 number2 = gets.chomp
 
-puts "What operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide"
+prompt "What operation would you like to perform? 1) add 2) subtract 3) multiply 4) divide"
 operator = gets.chomp
 
 if operator == '1'
@@ -19,4 +24,4 @@ elsif operator == '4'
   result = number1.to_f / number2.to_f
 end
 
-puts "The result is #{result}"
+prompt "The result is #{result}"
