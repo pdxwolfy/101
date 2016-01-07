@@ -24,11 +24,13 @@ require 'yaml'
 LANGUAGE = 'en'
 MESSAGES = YAML.load_file('loancalc.yml')[LANGUAGE]
 
+#-----------------------------------------------------------------------------
 # Display a prompt
 def prompt(message)
   puts "=> #{message}"
 end
 
+#-----------------------------------------------------------------------------
 # Get loan amount from user. Returns non-negative float.
 def loan_amount
   loop do
@@ -38,6 +40,7 @@ def loan_amount
   end
 end
 
+#-----------------------------------------------------------------------------
 # Get loan APR from user. Returns float between 0.0 and 1.0
 def loan_apr
   loop do
@@ -47,6 +50,7 @@ def loan_apr
   end
 end
 
+#-----------------------------------------------------------------------------
 # Get loan duration in years. Returns integer.
 def loan_duration_in_years
   loop do
@@ -56,29 +60,34 @@ def loan_duration_in_years
   end
 end
 
+#-----------------------------------------------------------------------------
 # Display a prompt and get a string
 def solicit(message)
   prompt(message)
   gets.chomp
 end
 
+#-----------------------------------------------------------------------------
 # Return true if #{value} can be properly represented as an APR between 0.00
 # and 1.00, false otherwise.
 def valid_apr?(value)
   valid_non_negative_float?(value) && value.to_f <= 1.00
 end
 
+#-----------------------------------------------------------------------------
 # Returns true if #{value} can be properly represented as a dollar amount.
 def valid_dollar_amount?(value)
   valid_non_negative_float? value
 end
 
+#-----------------------------------------------------------------------------
 # Returns true if #{value} can be properly represented as a valid duration in
 # years.
 def valid_duration?(value)
   valid_non_negative_integer? value
 end
 
+#-----------------------------------------------------------------------------
 # Returns true if #{value} can be properly represented as a floating point
 # number, false otherwise.
 def valid_float?(value)
@@ -87,6 +96,7 @@ rescue ArgumentError
   false
 end
 
+#-----------------------------------------------------------------------------
 # Returns true if #{value} can be properly represented as an Integer, false
 # otherwise.
 def valid_integer?(value)
@@ -95,18 +105,22 @@ rescue ArgumentError
   false
 end
 
+#-----------------------------------------------------------------------------
 # Returns true if #{value} can be properly represented as a non-negative
 # floating point number, false otherwise.
 def valid_non_negative_float?(value)
   valid_float?(value) && value.to_f >= 0.00
 end
 
+#-----------------------------------------------------------------------------
 # Returns true if #{value} can be properly represented as a non-negative
 # integer, false otherwise.
 def valid_non_negative_integer?(value)
   valid_integer?(value) && value.to_i >= 0
 end
 
+#-----------------------------------------------------------------------------
+# Main processing
 prompt MESSAGES['welcome']
 loop do
   amount = loan_amount
