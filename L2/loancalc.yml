@@ -1,4 +1,10 @@
 en:
+    bad_amount:     That doesn't look like a dollar amount.
+    bad_apr:        That doesn't look like an APR.
+    enter_amount:   'What is the amount of the loan (in dollars)?'
+    enter_apr:      What is the APR for the load (enter .07 for 7%, for example)
+    try_again:      Perform another loan calculation? (Y for yes)
     welcome:        |
-        Welcome to the Car Loan and Mortgage Payment Calculator!
-           --------------------------------------------------------
+                    Welcome to the Car Loan and Mortgage Payment Calculator!
+                       --------------------------------------------------------
+    'yes':          y
