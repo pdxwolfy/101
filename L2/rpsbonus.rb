@@ -45,10 +45,6 @@ def game_over?(scores)
   scores.any? { |_, score| score >= WINNING_SCORE }
 end
 
-def prompt(message)
-  puts "=> #{message}"
-end
-
 def fetch_choice
   choice = Kernel.gets.chomp.downcase
   VALID_CHOICES.key?(choice) ? VALID_CHOICES[choice] : choice
@@ -66,19 +62,17 @@ end
 
 def show_choices(player, computer)
   choices = { player: player, computer: computer }
-  prompt format(MESSAGES[:the_choices_were], choices)
+  puts format(MESSAGES[:the_choices_were], choices)
 end
 
 def solicit_choice
   main_prompt = "#{MESSAGES[:choose_one]}: #{VALID_CHOICES.values.join ', '}"
-  prompt main_prompt
-  prompt MESSAGES[:abbreviations]
+  puts main_prompt, MESSAGES[:abbreviations]
   loop do
     choice = fetch_choice
     return choice if VALID_CHOICES.values.include? choice
 
-    prompt MESSAGES[:invalid_choice]
-    prompt main_prompt
+    puts MESSAGES[:invalid_choice], main_prompt
   end
 end
 
@@ -86,7 +80,7 @@ def win?(player1, player2)
   WINNING_COMBOS[player1].include? player2
 end
 
-prompt MESSAGES[:welcome]
+puts MESSAGES[:welcome]
 scores = { player: 0, computer: 0 }
 
 loop do
@@ -100,16 +94,15 @@ loop do
   elsif round_result == :computer_won
     scores[:computer] += 1
   end
-  prompt MESSAGES[round_result]
-  prompt format(MESSAGES[:the_score_is], scores)
+  puts MESSAGES[round_result], format(MESSAGES[:the_score_is], scores)
 
   break if game_over? scores
 end
 
 if scores[:player] > scores[:computer]
-  prompt MESSAGES[:congratulations]
+  puts MESSAGES[:congratulations]
 else
-  prompt MESSAGES[:you_lost]
+  puts MESSAGES[:you_lost]
 end
 
-prompt MESSAGES[:thanks_and_bye]
+puts MESSAGES[:thanks_and_bye]
