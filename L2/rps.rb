@@ -1,13 +1,14 @@
 VALID_CHOICES = %w(rock paper scissors)
 
 def test_method
+  prompt "Test message"
 end
+
+test_method
 
 def prompt(message)
   puts "=> #{message}"
 end
-
-test_method
 
 def display_results(player, computer)
   prompt "You chose #{player}. Computer chose #{computer}."
