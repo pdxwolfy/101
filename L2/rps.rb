@@ -4,6 +4,21 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+def display_results(player, computer)
+  prompt "You chose #{player}. Computer chose #{computer}."
+  if (player == 'rock' && computer == 'scissors') ||
+     (player == 'paper' && computer == 'rock') ||
+     (player == 'scissors' && computer == 'paper')
+    prompt 'You won!'
+  elsif (player == 'rock' && computer == 'paper') ||
+        (player == 'paper' && computer == 'scissors') ||
+        (player == 'scissors' && computer == 'rock')
+    prompt 'Computer won!'
+  else
+    prompt 'Tie game!'
+  end
+end
+
 loop do
   choice = ''
   loop do
@@ -13,20 +28,8 @@ loop do
     prompt "That is not a valid choice."
   end
 
-  computer_choice = VALID_CHOICES.sample
-  if (choice == 'rock' && computer_choice == 'scissors') ||
-     (choice == 'paper' && computer_choice == 'rock') ||
-     (choice == 'scissors' && computer_choice == 'paper')
-    prompt 'You won!'
-  elsif (choice == 'rock' && computer_choice == 'paper') ||
-        (choice == 'paper' && computer_choice == 'scissors') ||
-        (choice == 'scissors' && computer_choice == 'rock')
-    prompt 'Computer won!'
-  else
-    prompt 'Tie game!'
-  end
+  display_results choice, VALID_CHOICES.sample
 
-  prompt "You chose #{choice}. Computer chose #{computer_choice}."
   prompt "Do you want to play again?"
   answer = gets.chomp
   break unless answer.start_with? 'y'
