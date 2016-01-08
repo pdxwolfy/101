@@ -88,6 +88,7 @@ scores = { player: 0, computer: 0 }
 loop do
   player_choice = solicit_choice
   computer_choice = VALID_CHOICES.values.sample
+  system 'clear'
   show_choices player_choice, computer_choice
 
   round_result = results(player_choice, computer_choice)
@@ -96,7 +97,7 @@ loop do
   elsif round_result == :computer_won
     scores[:computer] += 1
   end
-  puts MESSAGES[round_result], format(MESSAGES[:the_score_is], scores)
+  puts MESSAGES[round_result], format(MESSAGES[:the_score_is], scores), ""
 
   break if game_over? scores
 end
