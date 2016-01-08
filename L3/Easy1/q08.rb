@@ -1,5 +1,5 @@
-flintstones = ["Fred", "Wilma"]
-flintstones << ["Barney", "Betty"]
-flintstones << ["BamBam", "Pebbles"]
+flintstones = %w(Fred Wilma)
+flintstones << %w(Barney Betty)
+flintstones << %w(BamBam Pebbles)
 flintstones.flatten!
 p flintstones
