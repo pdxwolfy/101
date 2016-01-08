@@ -4,21 +4,20 @@ WINNING_COMBOS = { # my choice => computer choice
   'paper' => 'rock',
   'scissors' => 'paper'
 }
-LOSING_COMBOS = { # my choice => computer choice
-  'rock' => 'paper',
-  'paper' => 'scissors',
-  'scissors' => 'rock'
-}
 
 def prompt(message)
   puts "=> #{message}"
 end
 
+def win?(player1, player2)
+  WINNING_COMBOS[player1] == player2
+end
+
 # Renaming as results() so it doesn't appear to be printing something.
 def results(player, computer)
-  if WINNING_COMBOS[player] == computer
+  if win?(player, computer)
     'You won!'
-  elsif LOSING_COMBOS[player] == computer
+  elsif win?(computer, player)
     'Computer won!'
   else
     'Tie game!'
