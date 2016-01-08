@@ -9,7 +9,7 @@ VALID_CHOICES = { # abbreviation => full value
   'l'  => 'lizard'
 }
 
-WINNING_COMBOS = { # my choice => computer choice
+WINNING_COMBOS = { # player1 choice => player2 choice
   'rock'     => %w(scissors lizard),
   'paper'    => %w(rock spock),
   'scissors' => %w(paper lizard),
@@ -18,7 +18,7 @@ WINNING_COMBOS = { # my choice => computer choice
 }
 
 MESSAGES = {
-  abbreviations:  <<-EOS,
+  abbreviations:    <<-EOS,
 You may abbreviate choices as follows:
     r  -> rock
     p  -> paper
@@ -26,13 +26,17 @@ You may abbreviate choices as follows:
     l  -> lizard
     sp -> spock
 EOS
-  computer_won:    'Computer won this round.',
-  congratulations: 'Congratulations. You won!',
-  thanks_and_bye:  'Bye! Thanks for playing.',
-  tie:             'Tie: nobody won this round.',
-  welcome:         'Welcome to Rock, Paper, Scissors, Lizard, Spock!',
-  you_lost:        'Sorry. You lost. Go me!',
-  you_won:         'You won this round.'
+  choose_one:       'Choose one',
+  computer_won:     'Computer won this round.',
+  congratulations:  'Congratulations. You won!',
+  invalid_choice:   'That is not a valid choice.',
+  thanks_and_bye:   'Bye! Thanks for playing.',
+  the_choices_were: 'You chose %{player}. The computer chose %{computer}.',
+  the_score_is:     'Score is:  you %{player}  me %{computer}',
+  tie:              'Tie: nobody won this round.',
+  welcome:          'Welcome to Rock, Paper, Scissors, Lizard, Spock!',
+  you_lost:         'Sorry. You lost. Go me!',
+  you_won:          'You won this round.'
 }
 
 WINNING_SCORE = 5  # First player to this score wins.
@@ -45,6 +49,11 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+def fetch_choice
+  choice = Kernel.gets.chomp.downcase
+  VALID_CHOICES.key?(choice) ? VALID_CHOICES[choice] : choice
+end
+
 def results(player, computer)
   if win?(player, computer)
     :you_won
@@ -55,14 +64,21 @@ def results(player, computer)
   end
 end
 
+def show_choices(player, computer)
+  choices = { player: player, computer: computer }
+  prompt format(MESSAGES[:the_choices_were], choices)
+end
+
 def solicit_choice
+  main_prompt = "#{MESSAGES[:choose_one]}: #{VALID_CHOICES.values.join ', '}"
+  prompt main_prompt
+  prompt MESSAGES[:abbreviations]
   loop do
-    prompt "Choose one: #{VALID_CHOICES.values.join ', '}"
-    choice = Kernel.gets.chomp.downcase
-    choice = VALID_CHOICES[choice] if VALID_CHOICES.key? choice
+    choice = fetch_choice
     return choice if VALID_CHOICES.values.include? choice
 
-    prompt "That is not a valid choice."
+    prompt MESSAGES[:invalid_choice]
+    prompt main_prompt
   end
 end
 
@@ -71,13 +87,12 @@ def win?(player1, player2)
 end
 
 prompt MESSAGES[:welcome]
-prompt MESSAGES[:abbreviations]
-scores = Hash.new 0
+scores = { player: 0, computer: 0 }
 
 loop do
   player_choice = solicit_choice
   computer_choice = VALID_CHOICES.values.sample
-  prompt "You chose #{player_choice}. Computer chose #{computer_choice}."
+  show_choices player_choice, computer_choice
 
   round_result = results(player_choice, computer_choice)
   if round_result == :you_won
@@ -86,7 +101,7 @@ loop do
     scores[:computer] += 1
   end
   prompt MESSAGES[round_result]
-  prompt "Score is:  you #{scores[:player]}    me #{scores[:computer]}"
+  prompt format(MESSAGES[:the_score_is], scores)
 
   break if game_over? scores
 end
