@@ -25,7 +25,7 @@ You may abbreviate choices as follows:
     sc -> scissors
     l  -> lizard
     sp -> spock
-  EOS
+EOS
   computer_won:    'Computer won this round.',
   congratulations: 'Congratulations. You won!',
   thanks_and_bye:  'Bye! Thanks for playing.',
@@ -37,22 +37,14 @@ You may abbreviate choices as follows:
 
 WINNING_SCORE = 5  # First player to this score wins.
 
-#-----------------------------------------------------------------------------
-# Returns true if the game is over, false otherwise.
-
 def game_over?(scores)
   scores.any? { |_, score| score >= WINNING_SCORE }
 end
 
-#-----------------------------------------------------------------------------
-# Display a prompt or other message
 def prompt(message)
   puts "=> #{message}"
 end
 
-#-----------------------------------------------------------------------------
-# Returns a symbol (:you_won, :computer_won, or :tie) depending on whether the
-# player or computer won this round.
 def results(player, computer)
   if win?(player, computer)
     :you_won
@@ -63,8 +55,6 @@ def results(player, computer)
   end
 end
 
-#-----------------------------------------------------------------------------
-# Asks user for their choice (rock, paper, scissors) and returns that value.
 def solicit_choice
   loop do
     prompt "Choose one: #{VALID_CHOICES.values.join ', '}"
@@ -76,15 +66,9 @@ def solicit_choice
   end
 end
 
-#-----------------------------------------------------------------------------
-# Return true if player1's play (rock, paper, scissors) beats player2's play,
-# false otherwise.
 def win?(player1, player2)
   WINNING_COMBOS[player1].include? player2
 end
-
-#-----------------------------------------------------------------------------
-# Main processing. Keeps repeating until user doesn't want to continue.
 
 prompt MESSAGES[:welcome]
 prompt MESSAGES[:abbreviations]
