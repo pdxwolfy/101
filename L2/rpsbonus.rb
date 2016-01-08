@@ -46,7 +46,9 @@ def game_over?(scores)
 end
 
 def fetch_choice
-  choice = Kernel.gets.chomp.downcase
+  print "> "
+  choice = gets.chomp.downcase
+  puts ""
   VALID_CHOICES.key?(choice) ? VALID_CHOICES[choice] : choice
 end
 
@@ -99,10 +101,5 @@ loop do
   break if game_over? scores
 end
 
-if scores[:player] > scores[:computer]
-  puts MESSAGES[:congratulations]
-else
-  puts MESSAGES[:you_lost]
-end
-
-puts MESSAGES[:thanks_and_bye]
+end_state = (scores[:player] > scores[:computer]) ? :congratulations : :you_lost
+puts MESSAGES[end_state], MESSAGES[:thanks_and_bye]
