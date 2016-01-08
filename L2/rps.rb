@@ -1,4 +1,14 @@
 VALID_CHOICES = %w(rock paper scissors)
+WINNING_COMBOS = { # my choice => computer choice
+  'rock' => 'scissors',
+  'paper' => 'rock',
+  'scissors' => 'paper'
+}
+LOSING_COMBOS = { # my choice => computer choice
+  'rock' => 'paper',
+  'paper' => 'scissors',
+  'scissors' => 'rock'
+}
 
 def prompt(message)
   puts "=> #{message}"
@@ -6,13 +16,9 @@ end
 
 # Renaming as results() so it doesn't appear to be printing something.
 def results(player, computer)
-  if (player == 'rock' && computer == 'scissors') ||
-     (player == 'paper' && computer == 'rock') ||
-     (player == 'scissors' && computer == 'paper')
+  if WINNING_COMBOS[player] == computer
     'You won!'
-  elsif (player == 'rock' && computer == 'paper') ||
-        (player == 'paper' && computer == 'scissors') ||
-        (player == 'scissors' && computer == 'rock')
+  elsif LOSING_COMBOS[player] == computer
     'Computer won!'
   else
     'Tie game!'
