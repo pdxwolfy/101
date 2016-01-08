@@ -1,4 +1,11 @@
-VALID_CHOICES = %w(rock paper scissors spock lizard)
+VALID_CHOICES = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'sp' => 'spock',
+  'l' => 'lizard'
+}
+
 WINNING_COMBOS = { # my choice => computer choice
   'rock' => %w(scissors lizard),
   'paper' => %w(rock spock),
@@ -30,9 +37,10 @@ end
 # Asks user for their choice (rock, paper, scissors) and returns that value.
 def solicit_choice
   loop do
-    prompt "Choose one: #{VALID_CHOICES.join ', '}"
+    prompt "Choose one: #{VALID_CHOICES.values.join ', '}"
     choice = Kernel.gets.chomp
-    return choice if VALID_CHOICES.include? choice
+    choice = VALID_CHOICES[choice] if VALID_CHOICES.key? choice
+    return choice if VALID_CHOICES.values.include? choice
 
     prompt "That is not a valid choice."
   end
@@ -49,7 +57,7 @@ end
 # Main processing. Keeps repeating until user doesn't want to continue.
 loop do
   player_choice = solicit_choice
-  computer_choice = VALID_CHOICES.sample
+  computer_choice = VALID_CHOICES.values.sample
   prompt "You chose #{player_choice}. Computer chose #{computer_choice}."
   prompt results(player_choice, computer_choice)
 
