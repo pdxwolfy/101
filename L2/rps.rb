@@ -1,5 +1,14 @@
 VALID_CHOICES = %w(rock paper scissors)
 
+def test_method
+end
+
+def prompt(message)
+  puts "=> #{message}"
+end
+
+test_method
+
 def display_results(player, computer)
   prompt "You chose #{player}. Computer chose #{computer}."
   if (player == 'rock' && computer == 'scissors') ||
@@ -13,10 +22,6 @@ def display_results(player, computer)
   else
     prompt 'Tie game!'
   end
-end
-
-def prompt(message)
-  puts "=> #{message}"
 end
 
 loop do
