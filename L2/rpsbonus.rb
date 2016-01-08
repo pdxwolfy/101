@@ -26,10 +26,13 @@ You may abbreviate choices as follows:
     l  -> lizard
     sp -> spock
   EOS
-  you_won:        'You won this round.',
-  computer_won:   'Computer won this round.',
-  tie:            'Tie: nobody won this round.',
-  welcome:        'Welcome to Rock, Paper, Scissors, Lizard, Spock!'
+  computer_won:    'Computer won this round.',
+  congratulations: 'Congratulations. You won!',
+  thanks_and_bye:  'Bye! Thanks for playing.',
+  tie:             'Tie: nobody won this round.',
+  welcome:         'Welcome to Rock, Paper, Scissors, Lizard, Spock!',
+  you_lost:        'Sorry. You lost. Go me!',
+  you_won:         'You won this round.'
 }
 
 WINNING_SCORE = 5  # First player to this score wins.
@@ -105,9 +108,9 @@ loop do
 end
 
 if scores[:player] > scores[:computer]
-  prompt "Congratulations. You won!"
+  prompt MESSAGES[:congratulations]
 else
-  prompt "Sorry. You lost. Go me!"
+  prompt MESSAGES[:you_lost]
 end
 
-prompt "Bye! Thanks for playing."
+prompt MESSAGES[:thanks_and_bye]
