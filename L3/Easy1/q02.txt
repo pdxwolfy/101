@@ -1,0 +1,29 @@
+! and ? vary in meaning according to where they are used. For example, in the
+method names uniq! and integer?, ! and ? are merely part of the method names.
+There is no actual meaning to them in this situation, though there is an
+implied meaning. On the other hand, !something negates the boolean value
+{something}, while in a ? b : c the ? is part of the ?: operator.
+
+1. != is used in conditional expressions to compare two values for inequality.
+
+2. !something evaluates {something} as a boolean value, and then negates that
+value. If, for example, something evaluates as true, then !something evaluates
+as false. Similarly, if something evaluates as false, then !something evaluates
+as true.
+
+3. something! is merely a method name. The ! implies that the method may have
+some unexpected side effects (such as mutating the object to which the method
+is applied), but this is neither mandatory nor sufficient.
+
+4. ?something has no meaning in and of itself. As part of an expression of the
+form:
+     condition ? something : whatever
+however, ? something is part of the ternary operator ?:. The ? identifies the
+part of the expression that should be returned if condition is true.
+
+5. something? is merely a method name. The ? implies that the method will return
+a value that should be treated as a binary value (true of false), but this is
+neither mandatory nor sufficient.
+
+6. !!something produces a binary value of true or false.  If something is nil
+or false, then !!something is false. Otherwise, !!something is true.
