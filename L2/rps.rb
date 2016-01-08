@@ -1,27 +1,21 @@
 VALID_CHOICES = %w(rock paper scissors)
 
-def test_method
-  prompt "Test message"
-end
-
-test_method
-
 def prompt(message)
   puts "=> #{message}"
 end
 
-def display_results(player, computer)
-  prompt "You chose #{player}. Computer chose #{computer}."
+# Renaming as results() so it doesn't appear to be printing something.
+def results(player, computer)
   if (player == 'rock' && computer == 'scissors') ||
      (player == 'paper' && computer == 'rock') ||
      (player == 'scissors' && computer == 'paper')
-    prompt 'You won!'
+    'You won!'
   elsif (player == 'rock' && computer == 'paper') ||
         (player == 'paper' && computer == 'scissors') ||
         (player == 'scissors' && computer == 'rock')
-    prompt 'Computer won!'
+    'Computer won!'
   else
-    prompt 'Tie game!'
+    'Tie game!'
   end
 end
 
@@ -34,7 +28,10 @@ loop do
     prompt "That is not a valid choice."
   end
 
-  display_results choice, VALID_CHOICES.sample
+  computer_choice = VALID_CHOICES.sample
+  prompt "You chose #{choice}. Computer chose #{computer_choice}."
+  # We need to print the results
+  prompt results(choice, computer_choice)
 
   prompt "Do you want to play again?"
   answer = gets.chomp
