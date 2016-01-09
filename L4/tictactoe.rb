@@ -37,6 +37,8 @@ end
 def display(board)
   system 'clear'
   puts <<-EOS
+You are an #{PLAYER_MARKER}. Computer is a #{COMPUTER_MARKER}
+
          |     |
       #{board['1']}  |  #{board['2']}  |  #{board['3']}
          |     |
