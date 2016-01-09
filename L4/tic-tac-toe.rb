@@ -21,5 +21,13 @@ def initialize_board
   (1..9).map { |square| [square, ' '] }.to_h
 end
 
-board = initialize_board
-display board
+def play
+  board = initialize_board
+  play_a_round board
+end
+
+def play_a_round(board)
+  display board
+end
+
+play
