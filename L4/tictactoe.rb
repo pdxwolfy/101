@@ -77,7 +77,7 @@ def play_a_round!(board)
   computer_move! board unless game_over? board
   sleep 2
   return nil unless game_over? board
-  return TIE_GAME if tied_game board
+  return TIE_GAME if tied_game? board
   winner board
 end
 
@@ -111,7 +111,7 @@ def three_in_a_row(board, row)
   squares[0]
 end
 
-def tied_game(board)
+def tied_game?(board)
   empty_squares(board).empty?
 end
 
