@@ -14,6 +14,7 @@ MESSAGES = {
   you_lost:        'Tic! Tac! Toe! You lost. Sorry!'
 }
 
+STATES = { 'X' => :congratulations, 'O' => :you_lost, 'T' => :tie_game }
 WINNING_ROWS = %w(123 456 789 147 258 369 159 357)
 
 def computer_move!(board)
@@ -23,6 +24,7 @@ def computer_move!(board)
 end
 
 def display(board)
+  system 'clear'
   puts <<-EOS
          |     |
       #{board['1']}  |  #{board['2']}  |  #{board['3']}
@@ -38,13 +40,12 @@ def display(board)
 EOS
 end
 
-def game_over?(board)
-  winner(board) || tied_game(board)
+def empty_squares(board)
+  board.select { |_, state| state == ' ' }
 end
 
-# Returns X or O if one is a winner, T if a tie, nil if the game isn't over
-def game_state(board)
-  board.value?(' ') ? nil : '='
+def game_over?(board)
+  winner(board) || tied_game(board)
 end
 
 def initialize_board
@@ -53,18 +54,20 @@ end
 
 def play
   board = initialize_board
-  until game_over?(board)
-    play_a_round! board
-  end
-  report_results board
+  state = play_a_round! board while state.nil?
+  display board
+  puts '', MESSAGES[STATES[state]]
 end
 
+# Returns game state (X, O, T, nil)
 def play_a_round!(board)
-  system 'clear'
   display board
   player_move! board
   computer_move! board unless game_over? board
-  sleep 2 unless game_over? board
+  sleep 2
+  return nil unless game_over? board
+  return 'T' if tied_game board
+  winner board
 end
 
 def play_again?
@@ -77,25 +80,15 @@ end
 
 def player_move!(board)
   move = ''
+  available_squares = empty_squares board
   loop do
     puts MESSAGES[:play_prompt]
     print "> "
     move = gets.chomp
-    break if board[move] == ' '
+    break if available_squares.key? move
     puts MESSAGES[move.match(/^\d$/) ? :square_in_use : :invalid_square]
   end
   board[move] = 'X'
-end
-
-def report_results(board)
-  results = if tied_game board
-              :tie_game
-            elsif winner(board) == 'X'
-              :congratulations
-            else
-              :you_lost
-            end
-  puts MESSAGES[results]
 end
 
 # Returns X or O if row is all Xs or all Os, nil otherwise.
@@ -107,7 +100,7 @@ def three_in_a_row(board, row)
 end
 
 def tied_game(board)
-  !board.value? ' '
+  empty_squares(board).size == 0
 end
 
 # Returns X if X has won the game, O if O has won the game, nil otherwise.
