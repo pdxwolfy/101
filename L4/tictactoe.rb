@@ -6,9 +6,10 @@ MESSAGES = {
   i_selected:      'I selected square number %{move}',
   invalid_square:  'Invalid: that is the not the number of a square.',
   play_prompt:
-    "                                                       1 2 3\n" \
-    "Please enter your move (1-9). Squares are numbered as: 4 5 6\n" \
-    "                                                       7 8 9",
+    "Please enter your move %{available}. Squares are numbered as:\n" \
+    "    1 2 3\n" \
+    "    4 5 6\n" \
+    "    7 8 9",
   square_in_use:   'That square is in use.',
   tie_game:        'Tie game. Sigh.',
   you_lost:        'Tic! Tac! Toe! You lost. Sorry!'
@@ -81,8 +82,9 @@ end
 def player_move!(board)
   move = ''
   available_squares = empty_squares board
+  available_square_numbers = available_squares.keys.join ', '
   loop do
-    puts MESSAGES[:play_prompt]
+    puts format(MESSAGES[:play_prompt], available: available_square_numbers)
     print "> "
     move = gets.chomp
     break if available_squares.key? move
