@@ -29,7 +29,7 @@ STATES = {
 WINNING_ROWS = %w(123 456 789 147 258 369 159 357)
 
 def computer_move!(board)
-  move = empty_squares(board).keys.sample
+  move = empty_squares(board).sample
   puts format(MESSAGES[:i_selected], move: move)
   board[move] = COMPUTER_MARKER
 end
@@ -52,7 +52,7 @@ EOS
 end
 
 def empty_squares(board)
-  board.select { |_, state| state == INITIAL_MARKER }
+  board.select { |_, state| state == INITIAL_MARKER }.keys
 end
 
 def game_over?(board)
@@ -92,12 +92,12 @@ end
 def player_move!(board)
   move = ''
   available_squares = empty_squares board
-  available_square_numbers = available_squares.keys.join ', '
+  available_square_numbers = available_squares.join ', '
   loop do
     puts format(MESSAGES[:play_prompt], available: available_square_numbers)
     print "> "
     move = gets.chomp
-    break if available_squares.key? move
+    break if available_squares.include? move
     puts MESSAGES[move.match(/^\d$/) ? :square_in_use : :invalid_square]
   end
   board[move] = PLAYER_MARKER
