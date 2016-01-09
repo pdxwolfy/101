@@ -30,3 +30,5 @@ end
 
 result = fib(0, 1)
 puts "result is #{result}"
+
+# Alternatively, {limit} can be passed to fib() as a parameter.
