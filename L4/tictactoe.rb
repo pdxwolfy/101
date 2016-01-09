@@ -29,7 +29,7 @@ STATES = {
 WINNING_ROWS = %w(123 456 789 147 258 369 159 357)
 
 def computer_move!(board)
-  move = (rand(9) + 1).to_s until board[move] == INITIAL_MARKER
+  move = empty_squares(board).keys.sample
   puts format(MESSAGES[:i_selected], move: move)
   board[move] = COMPUTER_MARKER
 end
