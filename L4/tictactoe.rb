@@ -1,6 +1,11 @@
 # Tic-Tac-Toe game
 # Pete Hanson
 
+INITIAL_MARKER = ' '
+PLAYER_MARKER = 'X'
+COMPUTER_MARKER = 'O'
+TIE_GAME = 'T'
+
 MESSAGES = {
   congratulations: 'You won. Congratulations!',
   i_selected:      'I selected square number %{move}',
@@ -15,13 +20,18 @@ MESSAGES = {
   you_lost:        'Tic! Tac! Toe! You lost. Sorry!'
 }
 
-STATES = { 'X' => :congratulations, 'O' => :you_lost, 'T' => :tie_game }
+STATES = {
+  PLAYER_MARKER => :congratulations,
+  COMPUTER_MARKER => :you_lost,
+  TIE_GAME => :tie_game
+}
+
 WINNING_ROWS = %w(123 456 789 147 258 369 159 357)
 
 def computer_move!(board)
-  move = (rand(9) + 1).to_s until board[move] == ' '
+  move = (rand(9) + 1).to_s until board[move] == INITIAL_MARKER
   puts format(MESSAGES[:i_selected], move: move)
-  board[move] = 'O'
+  board[move] = COMPUTER_MARKER
 end
 
 def display(board)
@@ -42,7 +52,7 @@ EOS
 end
 
 def empty_squares(board)
-  board.select { |_, state| state == ' ' }
+  board.select { |_, state| state == INITIAL_MARKER }
 end
 
 def game_over?(board)
@@ -50,7 +60,7 @@ def game_over?(board)
 end
 
 def initialize_board
-  (1..9).map { |square| [square.to_s, ' '] }.to_h
+  (1..9).map { |square| [square.to_s, INITIAL_MARKER] }.to_h
 end
 
 def play
@@ -67,7 +77,7 @@ def play_a_round!(board)
   computer_move! board unless game_over? board
   sleep 2
   return nil unless game_over? board
-  return 'T' if tied_game board
+  return TIE_GAME if tied_game board
   winner board
 end
 
@@ -90,13 +100,13 @@ def player_move!(board)
     break if available_squares.key? move
     puts MESSAGES[move.match(/^\d$/) ? :square_in_use : :invalid_square]
   end
-  board[move] = 'X'
+  board[move] = PLAYER_MARKER
 end
 
 # Returns X or O if row is all Xs or all Os, nil otherwise.
 def three_in_a_row(board, row)
   squares = row.chars.map { |square| board[square] }
-  return nil if squares[0] == ' '
+  return nil if squares[0] == INITIAL_MARKER
   return nil unless squares[0] == squares[1] && squares[1] == squares[2]
   squares[0]
 end
