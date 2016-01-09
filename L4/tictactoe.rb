@@ -112,7 +112,7 @@ def three_in_a_row(board, row)
 end
 
 def tied_game(board)
-  empty_squares(board).size == 0
+  empty_squares(board).empty?
 end
 
 # Returns X if X has won the game, O if O has won the game, nil otherwise.
