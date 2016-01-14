@@ -21,20 +21,20 @@ def busted(hand)
   hand.last[:scores].empty?
 end
 
-def cards_and_possible_scores(hand, nkeep)
-  [cards_for_hand(hand, nkeep), possible_scores(hand, nkeep)]
+def cards_and_possible_scores(hand, keep_count)
+  [cards_for_hand(hand, keep_count), possible_scores(hand, keep_count)]
 end
 
-def cards_for_hand(hand, nkeep)
-  hand.take(nkeep).map { |card| card[:face] }.join ' '
+def cards_for_hand(hand, keep_count)
+  hand.take(keep_count).map { |card| card[:face] }.join ' '
 end
 
 def deal!(deck, hands)
   2.times { hands.values.map! { |hand| hit! deck, hand } }
 end
 
-def dealer_shows(hand, n_drop)
-  cards, scores = cards_and_possible_scores(hand, hand.size - n_drop)
+def dealer_shows(hand, drop_count)
+  cards, scores = cards_and_possible_scores(hand, hand.size - drop_count)
   puts "The dealer shows <#{cards}> #{points_or_bust scores}"
 end
 
@@ -123,8 +123,8 @@ def points_or_bust(scores)
   scores.empty? ? 'which is a bust.' : "for #{scores} points."
 end
 
-def possible_scores(hand, nkeep)
-  joinor(hand.take(nkeep).last[:scores])
+def possible_scores(hand, keep_count)
+  joinor(hand.take(keep_count).last[:scores])
 end
 
 def report_results(hands)
