@@ -201,7 +201,7 @@ end
 
 def choose_center_odd(data)
   center = (data[:board].size + 1) / 2
-  data[:board][center] == INITIAL_MARKER ? center : nil
+  center if data[:board][center] == INITIAL_MARKER
 end
 
 def choose_defensive_move(data)
