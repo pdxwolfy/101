@@ -49,7 +49,7 @@ FINAL_MATCH_STATUS = {
 #-----------------------------------------------------------------------------
 # Methods to manage board and movement key
 
-def display(data)
+def display_board(data)
   puts message(:instructions, data[:marker]), ''
   ncells = data[:degree]
   out = '---+' * (ncells - 1) + '---'
@@ -184,7 +184,7 @@ def choose_best_move(data, ncheck, player)
   unless check_cells.empty?
     values = key_values(data, check_cells[0])
     available = values.find_index INITIAL_MARKER
-    return check_cells[0][available] if available
+    check_cells[0][available] if available
   end
 end
 
@@ -251,7 +251,7 @@ def play_game!(data)
   # Who goes first in each game depends on who played last in previous game
   until game_over? data
     system 'clear'
-    display data
+    display_board data
     move! data
     sleep 2 if data[:current_player] == :computer
     data[:current_player] = other_player data[:current_player]
@@ -263,7 +263,7 @@ def play_match!(data)
     init_player! data
     data[:board] = new_board data[:degree]
     system 'clear'
-    display data
+    display_board data
     play_game! data
     the_winner = game_status data
     puts '', message(FINAL_GAME_STATUS[the_winner])
