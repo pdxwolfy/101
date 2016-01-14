@@ -1,8 +1,6 @@
 # 21 game
 # Pete Hanson
 
-require 'pry'
-
 STAKES = 500
 BET = 100
 MUST_STAY = 17
