@@ -1,60 +1,69 @@
 # 21 game
 # Pete Hanson
 
+require 'pry'
+
+STAKES = 500
+BET = 100
 MUST_STAY = 17
 
-def busted(data, hand)
-  data[hand].last[:scores].empty?
+def adjust_stakes!(stakes, hands)
+  player = final_score(hands[:player]) || 0
+  dealer = final_score(hands[:dealer]) || 0
+  if dealer > player
+    stakes[:player] -= BET
+    stakes[:dealer] += BET
+  elsif player > dealer
+    stakes[:player] += BET
+    stakes[:dealer] -= BET
+  end
 end
 
-def cards_and_possible_scores(data, hand, nkeep)
-  [cards_for_hand(data, hand, nkeep), possible_scores(data, hand, nkeep)]
+def busted(hand)
+  hand.last[:scores].empty?
 end
 
-def cards_for_hand(data, hand, nkeep)
-  data[hand].take(nkeep).map { |card| card[:face] }.join ' '
+def cards_and_possible_scores(hand, nkeep)
+  [cards_for_hand(hand, nkeep), possible_scores(hand, nkeep)]
 end
 
-def deal!(data)
-  [:player, :dealer].each { |hand| 2.times { hit! data, hand } }
+def cards_for_hand(hand, nkeep)
+  hand.take(nkeep).map { |card| card[:face] }.join ' '
 end
 
-def dealer_shows(data, n_drop)
-  n_keep = data[:dealer].size - n_drop
-  cards, scores = cards_and_possible_scores data, :dealer, n_keep
+def deal!(deck, hands)
+  2.times { hands.values.map! { |hand| hit! deck, hand } }
+end
+
+def dealer_shows(hand, n_drop)
+  cards, scores = cards_and_possible_scores(hand, hand.size - n_drop)
   puts "The dealer shows <#{cards}> #{points_or_bust scores}"
 end
 
-def dealer_turn(data)
-  dealer_scores = data[:dealer].last[:scores]
-  player_score = final_score(data, :player)
-  must_stay_count = dealer_scores.count { |score| score >= MUST_STAY }
+def dealer_turn(hand, player_hand)
+  scores = hand.last[:scores]
+  player_score = final_score(player_hand)
+  must_stay_count = scores.count { |score| score >= MUST_STAY }
   puts
-  return false if must_stay_count == dealer_scores.size
+  return false if must_stay_count == scores.size
   return true if must_stay_count == 0
-  !dealer_scores.any? { |score| score > player_score }
+  !scores.any? { |score| score > player_score }
 end
 
-def final_score(data, hand)
-  data[hand].last[:scores].max
+def final_score(hand)
+  hand.last[:scores].max
 end
 
-def hit!(data, hand)
-  face, values = data[:deck].pop
-  prev_scores = data[hand].empty? ? [0] : data[hand].last[:scores]
+def hit!(deck, hand)
+  face, values = deck.pop
+  prev_scores = hand.empty? ? [0] : hand.last[:scores]
   scores = values.each_with_object([]) do |score, list|
     prev_scores.each do |prev_score|
       total = score + prev_score
       list.push total if total <= 21
     end
   end
-  data[hand] << { face: face, scores: scores.uniq }
-end
-
-def initialize_deck
-  rank = (2..10).map { |face| [face, [face]] }
-  rank << [:J, [10]] << [:Q, [10]] << [:K, [10]] << [:A, [1, 11]]
-  (rank * 4).shuffle
+  hand << { face: face, scores: scores.uniq }
 end
 
 def joinor(list, sep = ', ', final = 'or')
@@ -62,31 +71,42 @@ def joinor(list, sep = ', ', final = 'or')
   list[0, list.size - 1].join(sep) + " #{final} #{list.last}"
 end
 
-def play!(data)
-  play_for_player!(data)
-  play_for_dealer!(data) unless busted data, :player
+def new_deck
+  rank = (2..10).map { |face| [face, [face]] }
+  rank << [:J, [10]] << [:Q, [10]] << [:K, [10]] << [:A, [1, 11]]
+  (rank * 4).shuffle
 end
 
-def play_for_dealer!(data)
+def play!(deck, hands, stakes)
+  player = hands[:player]
+  dealer = hands[:dealer]
+  puts "You have $#{stakes} remaining."
+  play_for_player!(deck, player, dealer)
+  play_for_dealer!(deck, dealer, player) unless busted player
+end
+
+def play_for_dealer!(deck, hand, player_hand)
+  dealer_shows hand, 0
   loop do
-    dealer_shows data, 0
-    break unless dealer_turn data
-    hit! data, :player
-    return if busted data, :player
+    break unless dealer_turn hand, player_hand
+    hit! deck, hand
+    dealer_shows hand, 0
+    sleep 2
+    return if busted hand
   end
 
-  puts "Dealer has stayed at #{final_score data, :dealer} points.", ''
+  puts "Dealer has stayed at #{final_score hand} points.", ''
 end
 
-def play_for_player!(data)
+def play_for_player!(deck, hand, dealer_hand)
   loop do
-    you_have data
-    dealer_shows data, 1
-    return if busted data, :player
+    you_have hand
+    dealer_shows dealer_hand, 1
+    return if busted hand
     break unless player_turn
-    hit! data, :player
+    hit! deck, hand
   end
-  puts "You have stayed at #{final_score data, :player} points.", ''
+  puts "You have stayed at #{final_score hand} points.", ''
 end
 
 def player_turn
@@ -105,13 +125,13 @@ def points_or_bust(scores)
   scores.empty? ? 'which is a bust.' : "for #{scores} points."
 end
 
-def possible_scores(data, hand, nkeep)
-  joinor(data[hand].take(nkeep).last[:scores])
+def possible_scores(hand, nkeep)
+  joinor(hand.take(nkeep).last[:scores])
 end
 
-def report_results(data)
-  player = final_score(data, :player)
-  dealer = final_score(data, :dealer)
+def report_results(hands)
+  player = final_score hands[:player]
+  dealer = final_score hands[:dealer]
   if player.nil?
     puts 'You busted. Dealer wins!'
   elsif dealer.nil?
@@ -125,31 +145,60 @@ def report_results(data)
   end
 end
 
-def you_have(data)
-  cards, scores = cards_and_possible_scores data, :player, data[:player].size
+def you_have(hand)
+  cards, scores = cards_and_possible_scores hand, hand.size
   puts "You have been dealt <#{cards}> #{points_or_bust scores}"
 end
+
+system 'clear'
+puts <<-EOS
+Welcome to 21!
+
+This game is similar to blackjack, but it lacks double-downs, 5 card charlies,
+and splits. Each hand is a $#{BET} bet, and your stake (as well as the house's
+stake) is $#{STAKES}. The first player to accumulate all of the available money wins.
+
+EOS
 
 # A card is a 2-element list. Element 0 is the face value of the card. Element
 # 1 is a list of possible scores for the card. We don't bother keep track of
 # suits since they are unimportant in 21.
 #
-# The data structure used to track and manage the game is organized as follows.
-# data[:deck]            Deck of undealt cards (randomized list of face values)
-# data[:player]          Data for player
-#   [i]                  ...for card #i
-#      [:face]           ......card face value
-#      [:scores]         ......possible total scores for cards 0->i (no busts)
-# data[:dealer]          Data for dealer
-#   [j]                  ...for card #j
-#      [:face]           ......card face value
-#      [:scores]         ......possible total scores for cards 0->j (no busts)
-data = {
-  deck:   initialize_deck,
-  player: [],
-  dealer: []
+# A deck is a 52 element shuffled list of cards. Each hand begins with a fresh
+# deck.
+#
+# A hand is list of hashes. Each element of the list represents one dealt card,
+# with the first card dealt at [0]. Each hash member has the following data:
+#    [:face]    Face value for card (2-10, :J, :Q, :K, :A)
+#    [:scores]  A list of possible scores for this card plus all cards
+#               previously deal t0 this hand. A busted hand has an empty list
+#               in this field/
+
+stakes = {
+  player: STAKES,
+  dealer: STAKES
 }
 
-deal! data
-play! data
-report_results data
+loop do
+  deck = new_deck
+  hands = {
+    player: [],
+    dealer: []
+  }
+
+  deal! deck, hands
+  play! deck, hands, stakes[:player]
+  adjust_stakes! stakes, hands
+  report_results hands
+  if stakes[:player] == 0
+    puts "Sorry. You are out of money. Come back later."
+    exit 0
+  elsif stakes[:dealer] == 0
+    puts "You've won the house limit. Please come again another time."
+    exit 0
+  else
+    puts 'Starting next hand...', '', '', ''
+    sleep 3
+    system 'clear'
+  end
+end
