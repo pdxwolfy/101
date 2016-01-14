@@ -22,21 +22,23 @@ def busted?(state, hand)
   get_scores(state, hand) == [0]
 end
 
-def cards_and_possible_scores(state, hand, n_drop)
-  n_keep = state[:hands][hand].size - n_drop
-  [cards_for_hand(state, hand, n_keep), possible_scores(state, hand, n_keep)]
+def cards_and_possible_scores(state, hand, drop_count)
+  keep_count = state[:hands][hand].size - drop_count
+  cards = cards_for_hand state, hand, keep_count
+  scores = possible_scores state, hand, keep_count
+  [cards, scores]
 end
 
-def cards_for_hand(state, hand, n_keep)
-  state[:hands][hand].take(n_keep).map { |card| card[:face] }.join ' '
+def cards_for_hand(state, hand, keep_count)
+  state[:hands][hand].take(keep_count).map { |card| card[:rank] }.join ' '
 end
 
 def deal!(state)
-  2.times { state[:hands].values.map! { |hand| hit! state, hand } }
+  2.times { state[:hands].keys.map! { |hand| hit! state, hand } }
 end
 
-def dealer_shows(state, hand, n_drop)
-  cards, scores = cards_and_possible_scores state, hand, n_drop
+def dealer_shows(state, hand, drop_count)
+  cards, scores = cards_and_possible_scores state, hand, drop_count
   puts "The dealer shows <#{cards}> #{points_or_bust scores}"
 end
 
@@ -61,21 +63,21 @@ end
 
 # returns [0] if no cards have been dealt
 def get_scores(state, hand)
-  binding.pry
   the_hand = state[:hands][hand]
   the_hand.empty? ? [0] : the_hand.last[:scores]
 end
 
 def hit!(state, hand)
-  face, values = state[:deck].pop
+  binding.pry
+  card = state[:deck].pop
   prev_scores = get_scores state, hand
-  scores = values.each_with_object([]) do |score, list|
+  scores = card[:values].each_with_object([]) do |score, list|
     prev_scores.each do |prev_score|
       total = score + prev_score
       list.push total if total <= state[:bust]
     end
   end
-  hand << { face: face, scores: scores.uniq }
+  hand << { rank: card[:rank], scores: scores.uniq }
 end
 
 def join_or(list, sep = ', ', final = 'or')
@@ -84,9 +86,10 @@ def join_or(list, sep = ', ', final = 'or')
 end
 
 def new_deck
-  rank = (2..10).map { |face| [face, [face]] }
-  rank << [:J, [10]] << [:Q, [10]] << [:K, [10]] << [:A, [1, 11]]
-  (rank * 4).shuffle
+  deck = (2..10).map { |rank| { rank: rank, scores: [rank] } }
+  [:J, :Q, :K].each { |rank| deck << { rank: rank, scores: [10] } }
+  deck << { rank: :A, scores: [1, 11] }
+  (deck * 4).shuffle
 end
 
 def play!(state)
@@ -137,8 +140,8 @@ def points_or_bust(state, hand)
   scores.empty? ? 'which is a bust.' : "for #{scores} points."
 end
 
-def possible_scores(state, hand, n_keep)
-  get_scores(state, hand).take n_keep
+def possible_scores(state, hand, keep_count)
+  get_scores(state, hand).take keep_count
 end
 
 def report_results(state)
@@ -210,21 +213,23 @@ $#{STAKES}. The first player to accumulate all of the available money wins.
 
 EOS
 
-# A card is a 2-element list. Element 0 is the face value of the card. Element
-# 1 is a list of possible scores for the card. We don't bother with suits since
-# they are unimportant in this game. A deck is a 52 element shuffled list of
-# cards. Each hand begins with a fresh deck.
+# Cards are implemented as hashes:
+#
+# [:rank]    Rank value for card (2-10, :J, :Q, :K, :A)
+# [:values]  A list of possible values fpr the card
+#
+# We don't bother with suits since they are unimportant in this game.
 #
 # A hand is list of hashes. Each element of the list represents one dealt card,
 # with the first card dealt at [0]. Each hash member has the following data:
 #
-# [:face]    Face value for card (2-10, :J, :Q, :K, :A)
+# [:rank]    Rank value for card (2-10, :J, :Q, :K, :A)
 # [:scores]  A list of possible scores for this card plus all cards previously
 #            dealt to this hand. A busted hand is represented by an empty list.
 #
 # The state hash info:
 #
-# [:deck]    The card deck
+# [:deck]    The card deck (a 52 element array of cards treated as a stack)
 # [:hands]   The two card hands
 #    [:player]   The player's hand
 #    [:dealer]   The dealer's hand

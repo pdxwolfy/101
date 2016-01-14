@@ -26,7 +26,7 @@ def cards_and_possible_scores(hand, keep_count)
 end
 
 def cards_for_hand(hand, keep_count)
-  hand.take(keep_count).map { |card| card[:face] }.join ' '
+  hand.take(keep_count).map { |card| card[:rank] }.join ' '
 end
 
 def deal!(deck, hands)
@@ -53,15 +53,15 @@ def final_score(hand)
 end
 
 def hit!(deck, hand)
-  face, values = deck.pop
+  card = deck.pop
   prev_scores = hand.empty? ? [0] : hand.last[:scores]
-  scores = values.each_with_object([]) do |score, list|
+  scores = card[:values].each_with_object([]) do |score, list|
     prev_scores.each do |prev_score|
       total = score + prev_score
       list.push total if total <= 21
     end
   end
-  hand << { face: face, scores: scores.uniq }
+  hand << { rank: card[:rank], scores: scores.uniq }
 end
 
 def joinor(list, sep = ', ', final = 'or')
@@ -70,9 +70,10 @@ def joinor(list, sep = ', ', final = 'or')
 end
 
 def new_deck
-  rank = (2..10).map { |face| [face, [face]] }
-  rank << [:J, [10]] << [:Q, [10]] << [:K, [10]] << [:A, [1, 11]]
-  (rank * 4).shuffle
+  deck = (2..10).map { |rank| { rank: rank, values: [rank] } }
+  [:J, :Q, :K].each { |rank| deck << { rank: rank, values: [10] } }
+  deck << { rank: :A, values: [1, 11] }
+  (deck * 4).shuffle
 end
 
 def play!(deck, hands, stakes)
@@ -158,7 +159,7 @@ stake) is $#{STAKES}. The first player to accumulate all of the available money 
 
 EOS
 
-# A card is a 2-element list. Element 0 is the face value of the card. Element
+# A card is a 2-element list. Element 0 is the rank value of the card. Element
 # 1 is a list of possible scores for the card. We don't bother keep track of
 # suits since they are unimportant in 21.
 #
@@ -167,7 +168,7 @@ EOS
 #
 # A hand is list of hashes. Each element of the list represents one dealt card,
 # with the first card dealt at [0]. Each hash member has the following data:
-#    [:face]    Face value for card (2-10, :J, :Q, :K, :A)
+#    [:rank]    Rank value for card (2-10, :J, :Q, :K, :A)
 #    [:scores]  A list of possible scores for this card plus all cards
 #               previously deal t0 this hand. A busted hand has an empty list
 #               in this field/
