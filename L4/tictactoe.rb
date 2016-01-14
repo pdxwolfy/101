@@ -49,10 +49,6 @@ FINAL_MATCH_STATUS = {
 #-----------------------------------------------------------------------------
 # Methods to manage board and movement key
 
-def content(data, cell)
-  cell == INITIAL_MARKER ? ' ' : data[:board][cell]
-end
-
 def display(data)
   puts message(:instructions, data[:marker]), ''
   ncells = data[:degree]
