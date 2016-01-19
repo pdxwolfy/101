@@ -159,8 +159,7 @@ def player_turn?
   loop do
     answer = prompt_and_read(prompt).downcase
     puts
-    return true if answer.start_with? 'h'
-    return false if answer.start_with? 's'
+    break answer == 'h' if answer.start_with?(*%w(h s))
     prompt = 'Invalid response. Please type H to hit, or S to stay.'
   end
 end
