@@ -245,7 +245,7 @@ end
 
 def to_integer(value, default, min, max)
   result = value.empty? ? default : Integer(value)
-  result if result >= min && result <= max
+  result if (min..max).include?(result)
 rescue ArgumentError
   nil
 end
