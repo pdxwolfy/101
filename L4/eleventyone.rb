@@ -28,6 +28,18 @@ def cards_for_hand(state, who)
   state[who][:hand].map { |a_card| a_card[:rank] }.join ' '
 end
 
+def check_game_end!(state)
+  player_wins = state[:player][:wins]
+  dealer_wins = state[:dealer][:wins]
+  score = "the game #{player_wins}-#{dealer_wins}"
+
+  if player_wins == MAX_POINTS
+    quit! "Congratulations! You reached 5 wins first, and have won #{score}."
+  elsif dealer_wins == MAX_POINTS
+    quit! "Sorry! The dealer reached 5 wins first, and you lost #{score}."
+  end
+end
+
 def compute_new_scores(state, who, new_card)
   scores = state[who][:scores].product(new_card[:values]).map do |the_scores|
     the_scores.inject(:+)
@@ -301,17 +313,8 @@ EOS
   loop do
     reset! state
     play! state
-
-    if state[:player][:wins] == MAX_POINTS
-      quit! "Congratulations! You reached 5 wins first, and have won the " \
-            "game #{state[:player][:wins]}-#{state[:dealer][:wins]}"
-    elsif state[:dealer][:wins] == MAX_POINTS
-      quit! "Sorry! The dealer reached 5 wins first, and you lost the game " \
-            "#{state[:player][:wins]}-#{state[:dealer][:wins]}"
-    else
-      answer = prompt_and_read 'Type Q to quit, anything else for next hand.'
-      exit 0 if answer.downcase.start_with? 'q'
-      system 'clear'
-    end
+    check_game_end! state
+    quit if quit?
+    system 'clear'
   end
 end

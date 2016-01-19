@@ -178,6 +178,58 @@ class CardsForHand < Test::Unit::TestCase
 end
 
 #------------------------------------------------------------------------------
+# check_game_end! state
+class CheckGameEndBang < Test::Unit::TestCase
+  self.test_order = :defined
+
+  def setup
+    @state = simple_state
+  end
+
+  def test_not_end
+    out = capture_stdout do
+      check_game_end!(@state)
+    end
+    assert_equal "", out
+  end
+
+  def test_player_wins
+    got_exit = false
+    @state[:player][:wins] = 5
+    @state[:dealer][:wins] = 3
+    out = capture_stdout do
+      begin
+        check_game_end!(@state)
+      rescue SystemExit
+        got_exit = true
+      end
+    end
+
+    msg = 'Congratulations! You reached 5 wins first, and have won the game ' \
+          "5-3.\n"
+    assert_equal msg, out
+    assert got_exit
+  end
+
+  def test_player_loses
+    got_exit = false
+    @state[:player][:wins] = 2
+    @state[:dealer][:wins] = 5
+    out = capture_stdout do
+      begin
+        check_game_end!(@state)
+      rescue SystemExit
+        got_exit = true
+      end
+    end
+
+    msg = "Sorry! The dealer reached 5 wins first, and you lost the game 2-5.\n"
+    assert_equal msg, out
+    assert got_exit
+  end
+end
+
+#------------------------------------------------------------------------------
 # compute_new_scores(state, hand, new_card)
 class ComputeNewScores < Test::Unit::TestCase
   self.test_order = :defined
@@ -1077,6 +1129,25 @@ class PromptAndread < Test::Unit::TestCase
     end
     assert_equal "This is a prompt\n> ", out
     assert_equal 'some text', answer
+  end
+end
+
+#------------------------------------------------------------------------------
+# quit!
+class QuitBang < Test::Unit::TestCase
+  self.test_order = :defined
+
+  def test_quit
+    got_exit = false
+    out = capture_stdout do
+      begin
+        quit!('Four score and seven.')
+      rescue SystemExit
+        got_exit = true
+      end
+    end
+    assert_equal "Four score and seven.\n", out
+    assert got_exit
   end
 end
 
