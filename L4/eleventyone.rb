@@ -13,14 +13,10 @@ end
 
 def card(rank)
   values = case rank
-           when (2..10)
-             [rank]
-           when :J, :Q, :K
-             [10]
-           when :A
-             [1, 11]
+           when (2..10)    then [rank]
+           when :J, :Q, :K then [10]
+           when :A         then [1, 11]
            end
-
   { rank: rank, values: values }
 end
 
