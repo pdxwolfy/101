@@ -1081,6 +1081,40 @@ class PromptAndread < Test::Unit::TestCase
 end
 
 #------------------------------------------------------------------------------
+# quit?
+class QuitQuery < Test::Unit::TestCase
+  self.test_order = :defined
+
+  def test_q
+    out = capture_stdout do
+      capture_stdin('q') { assert quit? }
+    end
+    assert_equal "Type Q to quit, anything else for next hand.\n> ", out
+  end
+
+  def test_quit
+    out = capture_stdout do
+      capture_stdin('QUIT') { assert quit? }
+    end
+    assert_equal "Type Q to quit, anything else for next hand.\n> ", out
+  end
+
+  def test_no
+    out = capture_stdout do
+      capture_stdin('no') { assert !quit? }
+    end
+    assert_equal "Type Q to quit, anything else for next hand.\n> ", out
+  end
+
+  def test_nempty
+    out = capture_stdout do
+      capture_stdin('') { assert !quit? }
+    end
+    assert_equal "Type Q to quit, anything else for next hand.\n> ", out
+  end
+end
+
+#------------------------------------------------------------------------------
 # record_win!(state)
 class RecordWinBang < Test::Unit::TestCase
   self.test_order = :defined

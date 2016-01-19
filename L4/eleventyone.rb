@@ -37,7 +37,7 @@ def compute_new_scores(state, who, new_card)
 end
 
 def deal!(state)
-  [:player, :dealer, :player].each { |who| hit! state, who }
+  %i(player dealer player).each { |who| hit! state, who }
   state[:dealer][:down] = get_card_from_deck! state
 end
 
@@ -157,9 +157,9 @@ end
 def player_turn?
   prompt = "Hit (H) or Stay (S)?"
   loop do
-    answer = prompt_and_read(prompt).downcase
+    answer = prompt_and_read(prompt).downcase[0]
     puts
-    break answer == 'h' if answer.start_with?(*%w(h s))
+    break answer == 'h' if %w(h s).include?(answer)
     prompt = 'Invalid response. Please type H to hit, or S to stay.'
   end
 end
@@ -186,6 +186,11 @@ end
 def quit!(msg)
   puts msg
   exit 0
+end
+
+def quit?
+  answer = prompt_and_read 'Type Q to quit, anything else for next hand.'
+  answer.downcase.start_with? 'q'
 end
 
 def record_win!(state)
