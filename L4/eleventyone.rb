@@ -110,7 +110,7 @@ def max_score?(state, who)
 end
 
 def new_deck
-  ranks = (2..10).to_a + [:J, :Q, :K, :A]
+  ranks = (2..10).to_a + %i(J Q K A)
   one_suit = ranks.map { |rank| card rank }
   (one_suit * 4).shuffle
 end
