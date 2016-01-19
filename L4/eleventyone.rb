@@ -258,7 +258,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   system 'clear'
   puts <<-EOS
-Welcome to Elebenty-1!
+Welcome to Eleventy-1!
 
 This game is similar to blackjack, but it lacks double-downs, 5 card charlies,
 and splits. It also allows the player to set the target score (21 by default).
