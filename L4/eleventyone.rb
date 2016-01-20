@@ -25,7 +25,7 @@ def cards_and_possible_scores(state, who)
 end
 
 def cards_for_hand(state, who)
-  state[who][:hand].map { |a_card| a_card[:rank] }.join ' '
+  state[who][:hand].map { |a_card| a_card[:rank] }.join(' ')
 end
 
 def check_game_end!(state)
@@ -34,9 +34,9 @@ def check_game_end!(state)
   score = "the game #{player_wins}-#{dealer_wins}"
 
   if player_wins == MAX_POINTS
-    quit! "Congratulations! You reached 5 wins first, and have won #{score}."
+    quit!("Congratulations! You reached 5 wins first, and have won #{score}.")
   elsif dealer_wins == MAX_POINTS
-    quit! "Sorry! The dealer reached 5 wins first, and you lost #{score}."
+    quit!("Sorry! The dealer reached 5 wins first, and you lost #{score}.")
   end
 end
 
@@ -49,18 +49,18 @@ def compute_new_scores(state, who, new_card)
 end
 
 def deal!(state)
-  %i(player dealer player).each { |who| hit! state, who }
-  state[:dealer][:down] = get_card_from_deck! state
+  %i(player dealer player).each { |who| hit!(state, who) }
+  state[:dealer][:down] = get_card_from_deck!(state)
 end
 
 def dealer_shows(state, has = 'has been dealt')
-  cards, scores = cards_and_possible_scores state, :dealer
+  cards, scores = cards_and_possible_scores(state, :dealer)
   puts "The dealer #{has} <#{cards}> #{points_or_bust scores}"
 end
 
 # true -> hit, false -> stay (or busted)
 def dealer_turn?(state)
-  return false if busted? state, :dealer
+  return false if busted?(state, :dealer)
 
   dealer_scores = state[:dealer][:scores]
   hits, stays = dealer_scores.partition { |score| score < state[:target] - 4 }
@@ -74,9 +74,9 @@ def dealer_turn?(state)
 end
 
 def end_of_play_message(state, who)
-  if busted? state, who
+  if busted?(state, who)
     'busted.'
-  elsif max_score? state, who
+  elsif max_score?(state, who)
     "#{state[:target]}!"
   else
     "stayed at #{final_score state, who} points."
@@ -88,7 +88,7 @@ def final_score(state, who)
 end
 
 def flip_dealer_card!(state)
-  hit! state, :dealer, state[:dealer][:down]
+  hit!(state, :dealer, state[:dealer][:down])
 end
 
 def get_card_from_deck!(state)
@@ -103,14 +103,14 @@ end
 def hit!(state, who, card = nil)
   the_card = card || get_card_from_deck!(state)
   state[who][:hand] << the_card
-  state[who][:scores] = compute_new_scores state, who, the_card
+  state[who][:scores] = compute_new_scores(state, who, the_card)
 end
 
 def join_or(list, sep = ', ', final = 'or')
   if list.size <= 1 || final.empty?
-    list.join sep # e.g., "3"
+    list.join(sep) # e.g., "3"
   elsif list.size == 2
-    list.join " #{final} " # e.g., "3 or 5"
+    list.join(" #{final} ") # e.g., "3 or 5"
   else
     # e.g., "3, 4, or 6"
     list.take(list.size - 1).join(sep) + "#{sep}#{final} #{list.last}"
@@ -133,25 +133,25 @@ def play!(state)
   puts "You have won #{player_wins} game#{plural player_wins}; " \
        "the dealer has won #{dealer_wins}."
 
-  deal! state
-  play_for_player! state
+  deal!(state)
+  play_for_player!(state)
   puts "You have #{end_of_play_message state, :player}", ''
-  unless busted? state, :player
-    flip_dealer_card! state
-    play_for_dealer! state
+  unless busted?(state, :player)
+    flip_dealer_card!(state)
+    play_for_dealer!(state)
     puts '', "Dealer has #{end_of_play_message state, :dealer}", ''
   end
 
-  report_results state
-  record_win! state
+  report_results(state)
+  record_win!(state)
 end
 
 def play_for_dealer!(state)
-  dealer_shows state
-  while dealer_turn? state
-    hit! state, :dealer
-    dealer_shows state
-    sleep 2 if $stdout.isatty # conditional is for testing
+  dealer_shows(state)
+  while dealer_turn?(state)
+    hit!(state, :dealer)
+    dealer_shows(state)
+    sleep(2) if $stdout.isatty # conditional is for testing
     return if busted?(state, :dealer) || max_score?(state, :dealer)
   end
 end
@@ -201,8 +201,8 @@ def quit!(msg)
 end
 
 def quit?
-  answer = prompt_and_read 'Type Q to quit, anything else for next hand.'
-  answer.downcase.start_with? 'q'
+  answer = prompt_and_read('Type Q to quit, anything else for next hand.')
+  answer.downcase.start_with?('q')
 end
 
 def record_win!(state)
@@ -217,8 +217,8 @@ def record_win!(state)
 end
 
 def report_results(state)
-  player = final_score state, :player
-  dealer = final_score state, :dealer
+  player = final_score(state, :player)
+  dealer = final_score(state, :dealer)
 
   if player.nil?
     puts 'You busted. Dealer wins!'
@@ -239,10 +239,10 @@ def reset!(state)
 end
 
 def show_busted_or_max?(state, who, whohas)
-  if busted? state, who
+  if busted?(state, who)
     puts "#{whohas} busted."
     true
-  elsif max_score? state, who
+  elsif max_score?(state, who)
     puts "#{whohas} #{state[:target]}."
     true
   end
@@ -252,7 +252,7 @@ def solicit_bust_value
   puts ''
   prompt = "What score should each hand play to? (default: #{BUST})"
   loop do
-    answer = to_integer prompt_and_read(prompt), BUST, 11, 170
+    answer = to_integer(prompt_and_read(prompt), BUST, 11, 170)
     puts
     return answer if answer
     prompt = 'Please enter a value between 11 and 170, inclusive.'
@@ -267,12 +267,12 @@ rescue ArgumentError
 end
 
 def you_have(state)
-  cards, scores = cards_and_possible_scores state, :player
+  cards, scores = cards_and_possible_scores(state, :player)
   puts "You have been dealt <#{cards}> #{points_or_bust scores}"
 end
 
 if __FILE__ == $PROGRAM_NAME
-  system 'clear'
+  system('clear')
   puts <<-EOS
 Welcome to Eleventy-1!
 
@@ -315,6 +315,6 @@ EOS
     play!(state)
     check_game_end!(state)
     exit if quit?
-    system 'clear'
+    system('clear')
   end
 end
