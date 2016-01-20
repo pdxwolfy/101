@@ -261,7 +261,7 @@ end
 
 def to_integer(value, default, min, max)
   result = value.empty? ? default : Integer(value)
-  result if (min..max).include?(result)
+  result if (min..max).cover?(result)
 rescue ArgumentError
   nil
 end
@@ -311,10 +311,10 @@ EOS
 
   puts ''
   loop do
-    reset! state
-    play! state
-    check_game_end! state
-    quit if quit?
+    reset!(state)
+    play!(state)
+    check_game_end!(state)
+    exit if quit?
     system 'clear'
   end
 end
