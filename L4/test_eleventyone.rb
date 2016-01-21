@@ -7,22 +7,27 @@ require './eleventyone.rb'
 
 require 'stringio'
 
-module Kernel
-  def capture_stdin(*strings)
-    save_in = $stdin
-    $stdin = StringIO.new strings.join("\n") + "\n"
-    yield
-  ensure
-    $stdin = save_in
-  end
+def capture_stdin(*strings)
+  save_in = $stdin
+  $stdin = StringIO.new strings.join("\n") + "\n"
+  yield
+ensure
+  $stdin = save_in
+end
 
-  def capture_stdout
-    save_out = $stdout
-    $stdout = mock_out = StringIO.new
-    yield
-    mock_out.string
-  ensure
-    $stdout = save_out
+def capture_stdout
+  save_out = $stdout
+  $stdout = mock_out = StringIO.new
+  yield
+  mock_out.string
+ensure
+  $stdout = save_out
+end
+
+# String.clean
+class String
+  def clean
+    gsub(/^ +/, '')
   end
 end
 
@@ -34,6 +39,8 @@ def simple_state
     target: BUST
   }
 end
+
+SPACE = ' '.freeze
 
 #------------------------------------------------------------------------------
 # busted?(state, hand)
@@ -140,8 +147,8 @@ class CardsAndPossibleScores < Test::Unit::TestCase
     hit! @state, :dealer, card(:A)
     hit! @state, :dealer, card(2)
 
-    assert_equal ["3 10 8", "21"], cards_and_possible_scores(@state, :player)
-    assert_equal ["2 5 A 2", "10 or 20"],
+    assert_equal ['3 10 8', '21'], cards_and_possible_scores(@state, :player)
+    assert_equal ['2 5 A 2', '10 or 20'],
                  cards_and_possible_scores(@state, :dealer)
   end
 end
@@ -156,14 +163,14 @@ class CardsForHand < Test::Unit::TestCase
   end
 
   def test_empty_hand
-    assert_equal "", cards_for_hand(@state, :player)
+    assert_equal '', cards_for_hand(@state, :player)
   end
 
   def test_1_card_hand
     hit! @state, :player, card(:A)
     hit! @state, :dealer, card(10)
-    assert_equal "A", cards_for_hand(@state, :player)
-    assert_equal "10", cards_for_hand(@state, :dealer)
+    assert_equal 'A', cards_for_hand(@state, :player)
+    assert_equal '10', cards_for_hand(@state, :dealer)
   end
 
   def test_2_and_3_card_hands
@@ -172,8 +179,8 @@ class CardsForHand < Test::Unit::TestCase
     hit! @state, :dealer, card(8)
     hit! @state, :dealer, card(10)
     hit! @state, :dealer, card(8)
-    assert_equal "A 5", cards_for_hand(@state, :player)
-    assert_equal "8 10 8", cards_for_hand(@state, :dealer)
+    assert_equal 'A 5', cards_for_hand(@state, :player)
+    assert_equal '8 10 8', cards_for_hand(@state, :dealer)
   end
 end
 
@@ -190,7 +197,7 @@ class CheckGameEndBang < Test::Unit::TestCase
     out = capture_stdout do
       check_game_end!(@state)
     end
-    assert_equal "", out
+    assert_equal '', out
   end
 
   def test_player_wins
@@ -534,12 +541,10 @@ class GetCardFromDeckBang < Test::Unit::TestCase
 
   def test_get_card_from_new_deck
     get_card_from_deck! @state
-    outs = capture_stdout do
+    out = capture_stdout do
       get_card_from_deck! @state
     end
-    out = outs.split "\n"
-    assert_equal '', out[0]
-    assert_equal '*** A new deck has been put into play. ***', out[1]
+    assert_equal "\n*** A new deck has been put into play. ***\n\n", out
 
     the_card = nil
     ten_card = card 10
@@ -783,17 +788,17 @@ class PlayBang < Test::Unit::TestCase
   def test_play_no_hits_21_for_player
     @state[:deck] = [card(9), card(:A), card(10), card(:J)]
     out = capture_stdout { play! @state }
-    outs = out.split "\n"
-    assert_equal 9, outs.size
-    assert_equal 'You have won 0 games; the dealer has won 0.', outs[0]
-    assert_equal 'You have been dealt <J A> for 11 or 21 points.', outs[1]
-    assert_equal "You have #{BUST}!", outs[2]
-    assert_equal '', outs[3]
-    assert_equal 'The dealer has been dealt <10 9> for 19 points.', outs[4]
-    assert_equal '', outs[5]
-    assert_equal 'Dealer has stayed at 19 points.', outs[6]
-    assert_equal '', outs[7]
-    assert_equal 'You won 21-19!', outs[8]
+    assert_equal(<<-EOS.clean, out)
+      You have won 0 games; the dealer has won 0.
+      You have been dealt <J A> for 11 or 21 points.
+      You have #{BUST}!
+
+      The dealer has been dealt <10 9> for 19 points.
+
+      Dealer has stayed at 19 points.
+
+      You won 21-19!
+    EOS
   end
 
   def test_play_no_hits_dealer_wins
@@ -801,20 +806,20 @@ class PlayBang < Test::Unit::TestCase
     out = capture_stdout do
       capture_stdin('stay') { play! @state }
     end
-    outs = out.split "\n"
-    assert_equal 12, outs.size
-    assert_equal 'You have won 0 games; the dealer has won 0.', outs[0]
-    assert_equal 'You have been dealt <J 8> for 18 points.', outs[1]
-    assert_equal 'The dealer shows <10> for 10 points.', outs[2]
-    assert_equal 'Hit (H) or Stay (S)?', outs[3]
-    assert_equal '> ', outs[4]
-    assert_equal 'You have stayed at 18 points.', outs[5]
-    assert_equal '', outs[6]
-    assert_equal 'The dealer has been dealt <10 9> for 19 points.', outs[7]
-    assert_equal '', outs[8]
-    assert_equal 'Dealer has stayed at 19 points.', outs[9]
-    assert_equal '', outs[10]
-    assert_equal 'Dealer won 19-18.', outs[11]
+    assert_equal(<<-EOS.clean, out)
+      You have won 0 games; the dealer has won 0.
+      You have been dealt <J 8> for 18 points.
+      The dealer shows <10> for 10 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      You have stayed at 18 points.
+
+      The dealer has been dealt <10 9> for 19 points.
+
+      Dealer has stayed at 19 points.
+
+      Dealer won 19-18.
+    EOS
   end
 
   def test_play_both_players_hit
@@ -822,25 +827,25 @@ class PlayBang < Test::Unit::TestCase
     out = capture_stdout do
       capture_stdin(%w(hit stay)) { play! @state }
     end
-    outs = out.split "\n"
-    assert_equal 17, outs.size
-    assert_equal 'You have won 0 games; the dealer has won 0.', outs[0]
-    assert_equal 'You have been dealt <J 3> for 13 points.', outs[1]
-    assert_equal 'The dealer shows <10> for 10 points.', outs[2]
-    assert_equal 'Hit (H) or Stay (S)?', outs[3]
-    assert_equal '> ', outs[4]
-    assert_equal 'You have been dealt <J 3 7> for 20 points.', outs[5]
-    assert_equal 'The dealer shows <10> for 10 points.', outs[6]
-    assert_equal 'Hit (H) or Stay (S)?', outs[7]
-    assert_equal '> ', outs[8]
-    assert_equal 'You have stayed at 20 points.', outs[9]
-    assert_equal '', outs[10]
-    assert_equal 'The dealer has been dealt <10 2> for 12 points.', outs[11]
-    assert_equal 'The dealer has been dealt <10 2 9> for 21 points.', outs[12]
-    assert_equal '', outs[13]
-    assert_equal "Dealer has #{BUST}!", outs[14]
-    assert_equal '', outs[15]
-    assert_equal 'Dealer won 21-20.', outs[16]
+    assert_equal(<<-EOS.clean, out)
+      You have won 0 games; the dealer has won 0.
+      You have been dealt <J 3> for 13 points.
+      The dealer shows <10> for 10 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      You have been dealt <J 3 7> for 20 points.
+      The dealer shows <10> for 10 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      You have stayed at 20 points.
+
+      The dealer has been dealt <10 2> for 12 points.
+      The dealer has been dealt <10 2 9> for 21 points.
+
+      Dealer has #{BUST}!
+
+      Dealer won 21-20.
+    EOS
   end
 end
 
@@ -859,10 +864,10 @@ class PlayForDealerBang < Test::Unit::TestCase
     deal! @state
     flip_dealer_card! @state
     out = capture_stdout { play_for_dealer! @state }
-    outs = out.split "\n"
-    assert_equal 2, outs.size
-    assert_equal 'The dealer has been dealt <6 2> for 8 points.', outs[0]
-    assert_equal 'The dealer has been dealt <6 2 9> for 17 points.', outs[1]
+    assert_equal(<<-EOS.clean, out)
+      The dealer has been dealt <6 2> for 8 points.
+      The dealer has been dealt <6 2 9> for 17 points.
+    EOS
   end
 
   def test_play_21
@@ -870,12 +875,13 @@ class PlayForDealerBang < Test::Unit::TestCase
                      card(3), card(2)]
     deal! @state
     flip_dealer_card! @state
-    outs = capture_stdout { play_for_dealer! @state }.split "\n"
-    assert_equal 4, outs.size
-    assert_equal 'The dealer has been dealt <3 6> for 9 points.', outs[0]
-    assert_equal 'The dealer has been dealt <3 6 2> for 11 points.', outs[1]
-    assert_equal 'The dealer has been dealt <3 6 2 4> for 15 points.', outs[2]
-    assert_equal 'The dealer has been dealt <3 6 2 4 6> for 21 points.', outs[3]
+    out = capture_stdout { play_for_dealer! @state }
+    assert_equal(<<-EOS.clean, out)
+      The dealer has been dealt <3 6> for 9 points.
+      The dealer has been dealt <3 6 2> for 11 points.
+      The dealer has been dealt <3 6 2 4> for 15 points.
+      The dealer has been dealt <3 6 2 4 6> for 21 points.
+    EOS
   end
 
   def test_play_stay
@@ -883,11 +889,12 @@ class PlayForDealerBang < Test::Unit::TestCase
                      card(6), card(:J)]
     deal! @state
     flip_dealer_card! @state
-    outs = capture_stdout { play_for_dealer! @state }.split "\n"
-    assert_equal 3, outs.size
-    assert_equal 'The dealer has been dealt <6 4> for 10 points.', outs[0]
-    assert_equal 'The dealer has been dealt <6 4 6> for 16 points.', outs[1]
-    assert_equal 'The dealer has been dealt <6 4 6 2> for 18 points.', outs[2]
+    out = capture_stdout { play_for_dealer! @state }
+    assert_equal(<<-EOS.clean, out)
+      The dealer has been dealt <6 4> for 10 points.
+      The dealer has been dealt <6 4 6> for 16 points.
+      The dealer has been dealt <6 4 6 2> for 18 points.
+    EOS
   end
 
   def test_play_with_choice_of_play_or_stay
@@ -895,11 +902,10 @@ class PlayForDealerBang < Test::Unit::TestCase
     deal! @state
     flip_dealer_card! @state
     out = capture_stdout { play_for_dealer! @state }
-    outs = out.split "\n"
-    assert_equal 2, outs.size
-    assert_equal 'The dealer has been dealt <5 3> for 8 points.', outs[0]
-    assert_equal 'The dealer has been dealt <5 3 A> for 9 or 19 points.',
-                 outs[1]
+    assert_equal(<<-EOS.clean, out)
+      The dealer has been dealt <5 3> for 8 points.
+      The dealer has been dealt <5 3 A> for 9 or 19 points.
+    EOS
   end
 end
 
@@ -920,20 +926,19 @@ class PlayForPlayerBang < Test::Unit::TestCase
       capture_stdin('stay') { play_for_player! @state }
     end
 
-    outs = out.split "\n"
-    assert_equal 4, outs.size
-    assert_equal 'You have been dealt <4 6> for 10 points.', outs[0]
-    assert_equal 'The dealer shows <6> for 6 points.', outs[1]
-    assert_equal 'Hit (H) or Stay (S)?', outs[2]
-    assert_equal '> ', outs[3]
+    assert_equal(<<-EOS.clean, out)
+      You have been dealt <4 6> for 10 points.
+      The dealer shows <6> for 6 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+    EOS
   end
 
   def test_play_21
     @state[:deck] = [card(2), card(:A), card(6), card(:J)]
     deal! @state
-    outs = capture_stdout { play_for_player! @state }.split "\n"
-    assert_equal 1, outs.size
-    assert_equal 'You have been dealt <J A> for 11 or 21 points.', outs[0]
+    out = capture_stdout { play_for_player! @state }
+    assert_equal "You have been dealt <J A> for 11 or 21 points.\n", out
   end
 
   def test_play_hit_stay
@@ -943,16 +948,16 @@ class PlayForPlayerBang < Test::Unit::TestCase
       capture_stdin(%w(hit stay)) { play_for_player! @state }
     end
 
-    outs = out.split "\n"
-    assert_equal 8, outs.size
-    assert_equal 'You have been dealt <6 6> for 12 points.', outs[0]
-    assert_equal 'The dealer shows <4> for 4 points.', outs[1]
-    assert_equal 'Hit (H) or Stay (S)?', outs[2]
-    assert_equal '> ', outs[3]
-    assert_equal 'You have been dealt <6 6 2> for 14 points.', outs[4]
-    assert_equal 'The dealer shows <4> for 4 points.', outs[5]
-    assert_equal 'Hit (H) or Stay (S)?', outs[6]
-    assert_equal '> ', outs[7]
+    assert_equal(<<-EOS.clean, out)
+      You have been dealt <6 6> for 12 points.
+      The dealer shows <4> for 4 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      You have been dealt <6 6 2> for 14 points.
+      The dealer shows <4> for 4 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+    EOS
   end
 
   def test_play_hit_hit_stay
@@ -962,20 +967,20 @@ class PlayForPlayerBang < Test::Unit::TestCase
       capture_stdin(%w(hit H StAy)) { play_for_player! @state }
     end
 
-    outs = out.split "\n"
-    assert_equal 12, outs.size
-    assert_equal 'You have been dealt <2 4> for 6 points.', outs[0]
-    assert_equal 'The dealer shows <6> for 6 points.', outs[1]
-    assert_equal 'Hit (H) or Stay (S)?', outs[2]
-    assert_equal '> ', outs[3]
-    assert_equal 'You have been dealt <2 4 6> for 12 points.', outs[4]
-    assert_equal 'The dealer shows <6> for 6 points.', outs[5]
-    assert_equal 'Hit (H) or Stay (S)?', outs[6]
-    assert_equal '> ', outs[7]
-    assert_equal 'You have been dealt <2 4 6 2> for 14 points.', outs[8]
-    assert_equal 'The dealer shows <6> for 6 points.', outs[9]
-    assert_equal 'Hit (H) or Stay (S)?', outs[10]
-    assert_equal '> ', outs[11]
+    assert_equal(<<-EOS.clean, out)
+      You have been dealt <2 4> for 6 points.
+      The dealer shows <6> for 6 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      You have been dealt <2 4 6> for 12 points.
+      The dealer shows <6> for 6 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      You have been dealt <2 4 6 2> for 14 points.
+      The dealer shows <6> for 6 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+    EOS
   end
 
   def test_play_hit_stay_with_invalid_input
@@ -985,22 +990,20 @@ class PlayForPlayerBang < Test::Unit::TestCase
       capture_stdin(%w(x hit pass stay)) { play_for_player! @state }
     end
 
-    outs = out.split "\n"
-    assert_equal 12, outs.size
-    assert_equal 'You have been dealt <6 6> for 12 points.', outs[0]
-    assert_equal 'The dealer shows <4> for 4 points.', outs[1]
-    assert_equal 'Hit (H) or Stay (S)?', outs[2]
-    assert_equal '> ', outs[3]
-    assert_equal 'Invalid response. Please type H to hit, or S to stay.',
-                 outs[4]
-    assert_equal '> ', outs[5]
-    assert_equal 'You have been dealt <6 6 2> for 14 points.', outs[6]
-    assert_equal 'The dealer shows <4> for 4 points.', outs[7]
-    assert_equal 'Hit (H) or Stay (S)?', outs[8]
-    assert_equal '> ', outs[9]
-    assert_equal 'Invalid response. Please type H to hit, or S to stay.',
-                 outs[10]
-    assert_equal '> ', outs[11]
+    assert_equal(<<-EOS.clean, out)
+      You have been dealt <6 6> for 12 points.
+      The dealer shows <4> for 4 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      Invalid response. Please type H to hit, or S to stay.
+      >#{SPACE}
+      You have been dealt <6 6 2> for 14 points.
+      The dealer shows <4> for 4 points.
+      Hit (H) or Stay (S)?
+      >#{SPACE}
+      Invalid response. Please type H to hit, or S to stay.
+      >#{SPACE}
+    EOS
   end
 end
 
@@ -1087,8 +1090,8 @@ class PossibleScores < Test::Unit::TestCase
   def test_1_card_hands
     hit! @state, :player, card(5)
     hit! @state, :dealer, card(:A)
-    assert_equal "5",       possible_scores(@state, :player)
-    assert_equal "1 or 11", possible_scores(@state, :dealer)
+    assert_equal '5',       possible_scores(@state, :player)
+    assert_equal '1 or 11', possible_scores(@state, :dealer)
   end
 
   def test_2_card_hands_and_more
@@ -1097,8 +1100,8 @@ class PossibleScores < Test::Unit::TestCase
     hit! @state, :dealer, card(:A)
     hit! @state, :dealer, card(:A)
     hit! @state, :dealer, card(3)
-    assert_equal "6 or 16", possible_scores(@state, :player)
-    assert_equal "5 or 15", possible_scores(@state, :dealer)
+    assert_equal '6 or 16', possible_scores(@state, :player)
+    assert_equal '5 or 15', possible_scores(@state, :dealer)
   end
 
   def test_3_or_4_possibilities
@@ -1110,8 +1113,8 @@ class PossibleScores < Test::Unit::TestCase
     hit! @state, :dealer, card(:A)
     hit! @state, :dealer, card(:A)
     hit! @state, :dealer, card(6)
-    assert_equal "5, 15, or 25", possible_scores(@state, :player)
-    assert_equal "9, 19, 29, or 39", possible_scores(@state, :dealer)
+    assert_equal '5, 15, or 25', possible_scores(@state, :player)
+    assert_equal '9, 19, 29, or 39', possible_scores(@state, :dealer)
   end
 end
 

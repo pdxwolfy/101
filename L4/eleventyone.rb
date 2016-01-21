@@ -130,16 +130,16 @@ end
 def play!(state)
   player_wins = state[:player][:wins]
   dealer_wins = state[:dealer][:wins]
-  puts "You have won #{player_wins} game#{plural player_wins}; " \
+  puts "You have won #{player_wins} game#{plural(player_wins)}; " \
        "the dealer has won #{dealer_wins}."
 
   deal!(state)
   play_for_player!(state)
-  puts "You have #{end_of_play_message state, :player}", ''
+  puts "You have #{end_of_play_message(state, :player)}", ''
   unless busted?(state, :player)
     flip_dealer_card!(state)
     play_for_dealer!(state)
-    puts '', "Dealer has #{end_of_play_message state, :dealer}", ''
+    puts '', "Dealer has #{end_of_play_message(state, :dealer)}", ''
   end
 
   report_results(state)
@@ -167,7 +167,7 @@ def play_for_player!(state)
 end
 
 def player_turn?
-  prompt = "Hit (H) or Stay (S)?"
+  prompt = 'Hit (H) or Stay (S)?'
   loop do
     answer = prompt_and_read(prompt).downcase[0]
     puts
@@ -219,17 +219,14 @@ end
 def report_results(state)
   player = final_score(state, :player)
   dealer = final_score(state, :dealer)
+  score = [player, dealer].join('-')
 
-  if player.nil?
-    puts 'You busted. Dealer wins!'
-  elsif dealer.nil?
-    puts 'Dealer busted. You win!'
-  elsif player > dealer
-    puts "You won #{player}-#{dealer}!"
-  elsif dealer > player
-    puts "Dealer won #{dealer}-#{player}."
-  else
-    puts "Tie game: #{player}-#{dealer}."
+  case
+  when player.nil?     then puts 'You busted. Dealer wins!'
+  when dealer.nil?     then puts 'Dealer busted. You win!'
+  when player > dealer then puts "You won #{score}!"
+  when dealer > player then puts "You lost #{score}."
+  else                      puts "Tie game: #{score}."
   end
 end
 
