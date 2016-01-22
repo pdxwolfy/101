@@ -1,4 +1,4 @@
-# Challenge of the Week: Circule Buffer
+# Challenge of the Week: Circular Buffer
 # Pete Hanson
 class CircularBuffer
   class BufferEmptyException < RuntimeError; end
