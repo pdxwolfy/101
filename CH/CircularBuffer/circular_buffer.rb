@@ -36,7 +36,7 @@ class CircularBuffer
   FULL = 1
   OTHER = 2
 
-  def add_to_buffer(value)
+  def add_to_buffer(value) # { block called if buffer is full }
     return if value.nil?
     yield if full?
     @buffer[@write_index] = value
