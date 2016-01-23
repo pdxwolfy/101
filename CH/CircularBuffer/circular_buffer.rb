@@ -4,10 +4,6 @@ class CircularBuffer
   class BufferEmptyException < RuntimeError; end
   class BufferFullException < RuntimeError; end
 
-  EMPTY = 0
-  FULL = 1
-  OTHER = 2
-
   def initialize(number_of_cells)
     @buffer = Array.new(number_of_cells)
     @read_index = @write_index = 0
@@ -35,6 +31,10 @@ class CircularBuffer
 
   #---------------------------------------------------------------------------
   private
+
+  EMPTY = 0
+  FULL = 1
+  OTHER = 2
 
   def add_to_buffer(value)
     return if value.nil?
