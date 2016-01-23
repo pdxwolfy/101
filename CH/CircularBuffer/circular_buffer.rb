@@ -23,12 +23,10 @@ class CircularBuffer
   end
 
   def empty_or_full_helper
-    if @read_index != @write_index
-      OTHER
-    elsif @buffer[@read_index].nil? # must check nil? - value may be false
-      EMPTY
-    else
-      FULL
+    case
+    when @read_index != @write_index then OTHER
+    when @buffer[@read_index].nil?   then EMPTY # must check against nil
+    else                                  FULL
     end
   end
 
