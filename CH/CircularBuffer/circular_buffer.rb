@@ -13,18 +13,39 @@ class CircularBuffer
     @read_index = @write_index = 0
   end
 
+  def clear
+    initialize(@buffer.size)
+  end
+
+  def read
+    fail(BufferEmptyException) if empty?
+    result = @buffer[@read_index]
+    @buffer[@read_index] = nil
+    @read_index = advance(@read_index)
+    result
+  end
+
+  def write(value)
+    add_to_buffer(value) { fail(BufferFullException) }
+  end
+
+  def write!(value)
+    add_to_buffer(value) { @read_index = advance(@read_index) }
+  end
+
   def add_to_buffer(value)
+    return if value.nil?
+    yield if full?
     @buffer[@write_index] = value
     @write_index = advance(@write_index)
   end
 
+  #---------------------------------------------------------------------------
+  private
+
   def advance(pointer)
     pointer += 1
     (pointer == @buffer.size) ? 0 : pointer
-  end
-
-  def clear
-    initialize(@buffer.size)
   end
 
   def empty_or_full_helper
@@ -41,25 +62,5 @@ class CircularBuffer
 
   def full?
     empty_or_full_helper == FULL
-  end
-
-  def read
-    fail(BufferEmptyException) if empty?
-    result = @buffer[@read_index]
-    @buffer[@read_index] = nil
-    @read_index = advance(@read_index)
-    result
-  end
-
-  def write(value)
-    return if value.nil?
-    fail(BufferFullException) if full?
-    add_to_buffer(value)
-  end
-
-  def write!(value)
-    return if value.nil?
-    @read_index = advance(@read_index) if full?
-    add_to_buffer(value)
   end
 end
