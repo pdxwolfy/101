@@ -4,6 +4,10 @@ class CircularBuffer
   class BufferEmptyException < RuntimeError; end
   class BufferFullException < RuntimeError; end
 
+  EMPTY = 0
+  FULL = 1
+  OTHER = 2
+
   def initialize(number_of_cells)
     @buffer = Array.new(number_of_cells)
     @read_index = @write_index = 0
@@ -14,17 +18,26 @@ class CircularBuffer
     (pointer == @buffer.size) ? 0 : pointer
   end
 
+  def clear
+    initialize(@buffer.size)
+  end
+
+  def empty_or_full_helper
+    if @read_index != @write_index
+      OTHER
+    elsif @buffer[@read_index].nil? # must check nil? - value may be false
+      EMPTY
+    else
+      FULL
+    end
+  end
+
   def empty?
-    @read_index == @write_index && @buffer[@read_index].nil?
+    empty_or_full_helper == EMPTY
   end
 
   def full?
-    @read_index == @write_index && @buffer[@read_index]
-  end
-
-  def clear
-    @buffer.fill(nil)
-    @read_index = @write_index = 0
+    empty_or_full_helper == FULL
   end
 
   def read
@@ -36,10 +49,8 @@ class CircularBuffer
   end
 
   def write(value)
-    return if value.nil?
     fail(BufferFullException) if full?
-    @buffer[@write_index] = value
-    @write_index = advance(@write_index)
+    write!(value)
   end
 
   def write!(value)
