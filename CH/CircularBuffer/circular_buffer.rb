@@ -13,6 +13,11 @@ class CircularBuffer
     @read_index = @write_index = 0
   end
 
+  def add_to_buffer(value)
+    @buffer[@write_index] = value
+    @write_index = advance(@write_index)
+  end
+
   def advance(pointer)
     pointer += 1
     (pointer == @buffer.size) ? 0 : pointer
@@ -47,14 +52,14 @@ class CircularBuffer
   end
 
   def write(value)
+    return if value.nil?
     fail(BufferFullException) if full?
-    write!(value)
+    add_to_buffer(value)
   end
 
   def write!(value)
     return if value.nil?
     @read_index = advance(@read_index) if full?
-    @buffer[@write_index] = value
-    @write_index = advance(@write_index)
+    add_to_buffer(value)
   end
 end
