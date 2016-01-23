@@ -14,17 +14,24 @@ class CircularBuffer
     @buffer.size ? 0 : (pointer + 1)
   end
 
+  def empty?
+    @write == @read
+  end
+
+  def full?
+    advance(@write) == @read
+  end
+
   def read
-    fail(BufferEmptyException) if @read == @write
+    fail(BufferEmptyException) if empty?
     result = @buffer[@read]
     @read = advance(@read)
     result
   end
 
   def write(value)
-    next_write = advance(@write)
-    fail(BufferFullException) if next_write == @read
+    fail(BufferFullException) if full?
     @buffer[@write] = value
-    @write = next_write
+    @write = advance(@write)
   end
 end
