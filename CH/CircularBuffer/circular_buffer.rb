@@ -33,15 +33,15 @@ class CircularBuffer
     add_to_buffer(value) { @read_index = advance(@read_index) }
   end
 
+  #---------------------------------------------------------------------------
+  private
+
   def add_to_buffer(value)
     return if value.nil?
     yield if full?
     @buffer[@write_index] = value
     @write_index = advance(@write_index)
   end
-
-  #---------------------------------------------------------------------------
-  private
 
   def advance(pointer)
     pointer += 1
