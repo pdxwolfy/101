@@ -22,11 +22,18 @@ class CircularBuffer
   end
 
   def write(value)
-    add_to_buffer(value) { fail(BufferFullException) }
+    return if value.nil?
+    if full?
+      fail(BufferFullException) unless block_given?
+      yield
+    end
+
+    @buffer[@write_index] = value
+    @write_index = advance(@write_index)
   end
 
   def write!(value)
-    add_to_buffer(value) { @read_index = advance(@read_index) }
+    write(value) { @read_index = advance(@read_index) }
   end
 
   #---------------------------------------------------------------------------
@@ -35,13 +42,6 @@ class CircularBuffer
   EMPTY = 0
   FULL = 1
   OTHER = 2
-
-  def add_to_buffer(value) # { block called if buffer is full }
-    return if value.nil?
-    yield if full?
-    @buffer[@write_index] = value
-    @write_index = advance(@write_index)
-  end
 
   def advance(pointer)
     pointer += 1
