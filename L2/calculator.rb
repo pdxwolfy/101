@@ -1,6 +1,6 @@
 require 'yaml'
 
-LANGUAGE = 'de'
+LANGUAGE = 'en'
 MESSAGES = YAML.load_file('messages.yml')
 
 def messages(message, language = LANGUAGE)
@@ -40,7 +40,7 @@ loop do
   prompt messages('use_real_name')
 end
 
-prompt messages('hello') % { name: name }
+prompt format(messages('hello'), name: name)
 
 loop do
   number1 = ''
@@ -67,11 +67,9 @@ loop do
     prompt messages('bad_op')
   end
 
-  prompt messages('will_do') % {
-    operating: operation_verbing(operator),
-    number1: number1,
-    number2: number2
-  }
+  prompt format(messages('will_do'), operating: operation_verbing(operator),
+                                     number1: number1,
+                                     number2: number2)
 
   result =
     case operator
@@ -86,7 +84,7 @@ loop do
       number1.to_f / number2.to_f
     end
 
-  prompt messages('result_is') % { result: result }
+  prompt format(messages('result_is'), result: result)
   prompt messages('another_calc')
   answer = gets.chomp.downcase
   break unless answer.start_with? messages('yes')
